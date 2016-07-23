@@ -60,10 +60,10 @@ public abstract class ArenaManager {
 	// Arena Classes
 	private Map<String, ArenaClass> classes;
 
-	// we have to make sure KotH is even enabled
+	// we have to make sure the Minigame is even enabled
 	private boolean enabled;
 
-	// Commands that are allowed while playing koth.
+	// Commands that are allowed while playing the minigame.
 	private List<String> allowedcmds;
 
 	// Missing Warps
@@ -256,8 +256,11 @@ public abstract class ArenaManager {
 		ConfigUtils.addMissingRemoveObsolete(plugin, "prizes.yml",
 				ConfigUtils.makeSection(section, "prizes"));
 
-		PermissionUtils.registerPermission(plugin, "koth.arenas." + arenaName,
-				PermissionDefault.TRUE).addParent("koth.arenas", true);
+		PermissionUtils.registerPermission(
+				plugin,
+				plugin.getClass().getName().toLowerCase() + ".arenas."
+						+ arenaName, PermissionDefault.TRUE).addParent(
+				plugin.getClass().getName().toLowerCase() + ".arenas", true);
 
 		// Load the arena
 		return (load ? loadArena(arenaName) : null);
@@ -275,7 +278,9 @@ public abstract class ArenaManager {
 		config.set("arenas." + name, null);
 		plugin.saveConfig();
 
-		PermissionUtils.unregisterPermission(plugin, "koth.arenas." + name);
+		PermissionUtils.unregisterPermission(plugin, plugin.getClass()
+				.getName().toLowerCase()
+				+ ".arenas." + name);
 		JSLogger.getLogger().info("The arena '" + name + "' has been removed.");
 	}
 
@@ -479,8 +484,9 @@ public abstract class ArenaManager {
 		// Remove the class from the map.
 		classes.remove(lowercase);
 
-		PermissionUtils.unregisterPermission(plugin, "koth.classes."
-				+ lowercase);
+		PermissionUtils.unregisterPermission(plugin, plugin.getClass()
+				.getName().toLowerCase()
+				+ ".classes." + lowercase);
 	}
 
 	// --------------------------- //
@@ -554,9 +560,6 @@ public abstract class ArenaManager {
 
 		// Split by commas
 		String[] parts = cmds.split(",");
-
-		// Add in the /koth command.
-		allowedcmds.add("/koth");
 
 		// Add in each command
 		for (String part : parts) {
@@ -690,10 +693,6 @@ public abstract class ArenaManager {
 		if (arena.getLobby() == null) missing.add("lobby,");
 
 		if (arena.getSpec() == null) missing.add("spectator,");
-
-		if (arena.getWarps() == null
-				|| arena.getWarps().getConfigurationSection("hills") == null)
-			missing.add("hills,");
 		return missing;
 	}
 
