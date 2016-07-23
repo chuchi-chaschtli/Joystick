@@ -123,7 +123,7 @@ public class LocationSerializer {
 	 *            a double to reformat
 	 * @return a formatted String
 	 */
-	private static String toHundredths(double value) {
+	public static String toHundredths(double value) {
 		return new DecimalFormat("#.##").format(value);
 	}
 }

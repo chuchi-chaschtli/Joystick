@@ -27,6 +27,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.ArenaClass;
 import com.valygard.aohruthless.RatingSystem;
+import com.valygard.aohruthless.framework.spawn.Spawnpoint;
 import com.valygard.aohruthless.player.PlayerData;
 import com.valygard.aohruthless.player.PlayerStats;
 import com.valygard.aohruthless.utils.config.ConfigUtils;
@@ -88,13 +89,13 @@ public interface Arena {
 
 	/**
 	 * Grabs a location based on the
-	 * {@link ConfigUtils#parseLocation(ConfigurationSection, String, World)}
+	 * {@link ConfigUtils#deserializeLoc(ConfigurationSection, String, World)}
 	 * 
 	 * @param path
 	 *            a String configuration pathway.
-	 * @return a Location based on the given path.
+	 * @return a Spawnpoint based on the given path.
 	 */
-	public Location getLocation(String path);
+	public Spawnpoint getLocation(String path);
 
 	/**
 	 * Sets an important location in the warps sub-section of an arena.
@@ -114,7 +115,7 @@ public interface Arena {
 	 * 
 	 * @return a Location.
 	 */
-	public Location getLobby();
+	public Spawnpoint getLobby();
 
 	/**
 	 * Changes the location of the lobby to a given Location.
@@ -128,9 +129,9 @@ public interface Arena {
 	 * Grabs the spectator location. This is where players not on the red or
 	 * blue tam can watch the match unfold.
 	 * 
-	 * @return a Location
+	 * @return a Spawnpoint
 	 */
-	public Location getSpec();
+	public Spawnpoint getSpec();
 
 	/**
 	 * Changes the spectator warp to a given Location.
@@ -145,9 +146,9 @@ public interface Arena {
 	 * where players are teleported to after the arena finishes, and is the one
 	 * optional location in any arena.
 	 * 
-	 * @return a Location
+	 * @return a Spawnpoint
 	 */
-	public Location getEndWarp();
+	public Spawnpoint getEndWarp();
 
 	/**
 	 * Changes the end warp location to a given Location.
