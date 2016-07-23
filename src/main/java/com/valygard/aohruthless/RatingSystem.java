@@ -29,7 +29,7 @@ import com.valygard.aohruthless.player.PlayerStats;
  * in their personal stats file.
  * <p>
  * Note that the RatingSystem cannot be initialized and is specialized for each
- * Arena implementation
+ * Minigame implementation
  * 
  * @author Anand
  * 
@@ -52,6 +52,27 @@ public abstract class RatingSystem {
 	public RatingSystem(ArenaManager manager) {
 		this.manager = manager;
 	}
+
+	/**
+	 * Grabs the player's team mmr. If the arena is a free for all style
+	 * gamemode, then this will return the player's MMR.
+	 * 
+	 * @param player
+	 *            the Player to analyze
+	 * @return an int, an mmr estimate
+	 */
+	abstract int getTeamMMR(Player player);
+
+	/**
+	 * Grabs the opponent team's mmr of a given Player. If the arena is a free
+	 * for all style gamemode or there is more than 2 teams, this will return a
+	 * pooled value of all opponents MMR values.
+	 * 
+	 * @param player
+	 *            the Player to analyze opponents of
+	 * @return an int, an mmr estimate
+	 */
+	abstract int getOpponentMMR(Player player);
 
 	/**
 	 * Calculates the updated rating for a player.
@@ -80,7 +101,14 @@ public abstract class RatingSystem {
 	 *            Score: 0=Loss 0.5=Draw 1.0=Win
 	 * @return the new rating
 	 */
-	public abstract int getNewRating(Player player, double score);
+	public int getNewRating(Player player, double score) {
+		Arena arena = manager.getArenaWithPlayer(player);
+		double kFactor = getScoreConstant(player);
+		double expectedScore = getExpectedScore(getTeamMMR(player),
+				getOpponentMMR(player));
+		return calculateNewRating(arena.getStats(player).getMMR(), score,
+				expectedScore, kFactor);
+	}
 
 	/**
 	 * Calculate the new rating based on the ELO standard formula. newRating =
