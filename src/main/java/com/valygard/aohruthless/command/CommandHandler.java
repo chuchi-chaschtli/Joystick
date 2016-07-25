@@ -38,21 +38,24 @@ import com.valygard.aohruthless.utils.PermissionUtils;
  * @author Anand
  * 
  */
-public abstract class CommandHandler implements CommandExecutor {
+public class CommandHandler implements CommandExecutor {
 
 	private Plugin plugin;
 
 	private Map<String, Command> commands;
 
-	public CommandHandler(Plugin plugin, String cmdStart) {
+	/**
+	 * Constructor for Joystick command manager initializes by main class
+	 * instance
+	 * 
+	 * @param plugin
+	 *            main class instance
+	 */
+	public CommandHandler(Plugin plugin) {
 		this.plugin = plugin;
-		
+
 		registerCommands();
 	}
-
-	// --------------------------- //
-	// Command
-	// --------------------------- //
 
 	@Override
 	public boolean onCommand(CommandSender sender,
@@ -283,12 +286,13 @@ public abstract class CommandHandler implements CommandExecutor {
 				+ ChatColor.RESET + builder.toString());
 	}
 
-	// --------------------------- //
-	// Registration
-	// --------------------------- //
-
+	/**
+	 * Registers all commands using {@code #register(Class)}
+	 */
 	private void registerCommands() {
 		commands = new LinkedHashMap<String, Command>();
+
+		// TODO: Add commands
 	}
 
 	/**
@@ -298,7 +302,7 @@ public abstract class CommandHandler implements CommandExecutor {
 	 * @param c
 	 *            a class that implements Command
 	 */
-	public void register(Class<? extends Command> c) {
+	private void register(Class<? extends Command> c) {
 		CommandInfo info = c.getAnnotation(CommandInfo.class);
 		if (info == null) return;
 
