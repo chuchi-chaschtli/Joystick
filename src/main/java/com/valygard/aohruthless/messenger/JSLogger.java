@@ -38,7 +38,6 @@ public class JSLogger {
 	private Plugin plugin;
 	private Logger logger;
 
-	private static String prefix = "";
 	private static JSLogger instance;
 
 	/**
@@ -78,7 +77,6 @@ public class JSLogger {
 					"Cannot re-initialize singleton Logger");
 		}
 		instance = new JSLogger(plugin);
-		prefix = plugin.getClass().getName();
 	}
 
 	/**
@@ -128,7 +126,7 @@ public class JSLogger {
 
 			FileWriter fw = new FileWriter(file, true);
 			PrintWriter pw = new PrintWriter(fw);
-			pw.println(time + " " + prefix + "[" + level.toUpperCase() + "] : "
+			pw.println(time + " [Joystick] [" + level.toUpperCase() + "] : "
 					+ msg);
 			pw.close();
 		}
