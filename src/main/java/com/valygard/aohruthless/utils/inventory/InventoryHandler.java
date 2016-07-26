@@ -17,18 +17,17 @@
 package com.valygard.aohruthless.utils.inventory;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.json.simple.JSONArray;
 
-import com.valygard.aohruthless.framework.Arena;
+import com.valygard.aohruthless.utils.config.JsonConfiguration;
 
 /**
  * Inventory manager for a given arena. Handles storage and restoration of
@@ -42,14 +41,14 @@ public class InventoryHandler {
 
 	private final File dir;
 
-	private final Map<UUID, ItemStack[]> items, armor;
+	private final Map<String, ItemStack[]> items, armor;
 
-	public InventoryHandler(Arena arena) {
-		this.dir = new File(arena.getPlugin().getDataFolder(), "inventories");
+	public InventoryHandler(Plugin plugin) {
+		this.dir = new File(plugin.getDataFolder(), "inventories");
 		this.dir.mkdir();
 
-		this.items = new HashMap<UUID, ItemStack[]>();
-		this.armor = new HashMap<UUID, ItemStack[]>();
+		this.items = new HashMap<>();
+		this.armor = new HashMap<>();
 	}
 
 	/**
@@ -58,24 +57,23 @@ public class InventoryHandler {
 	 * the inventory in memory and on disk for convenience.
 	 * 
 	 * @param p
-	 * @throws IOException
 	 */
-	public void storeInventory(Player p) throws IOException {
+	@SuppressWarnings("unchecked")
+	public void storeInventory(Player p) {
 		ItemStack[] items = p.getInventory().getContents();
 		ItemStack[] armor = p.getInventory().getArmorContents();
 
 		UUID uuid = p.getUniqueId();
+		String name = p.getName();
 
-		this.items.put(uuid, items);
-		this.armor.put(uuid, armor);
+		this.items.put(name, items);
+		this.armor.put(name, armor);
 
-		File file = new File(dir, uuid.toString());
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("items", items);
-		config.set("armor", armor);
-		config.set("last-known-name", p.getName());
-		config.set("uuid", uuid.toString());
-		config.save(file);
+		JsonConfiguration json = new JsonConfiguration(dir, uuid.toString());
+		json.write(new String[] { "last-known-username", "uuid" },
+				new String[] { name, uuid.toString() });
+		json.write("items", new JSONArray().addAll(Arrays.asList(items)));
+		json.write("armor", new JSONArray().addAll(Arrays.asList(armor)));
 
 		// And clear the inventory
 		InventoryUtils.clearInventory(p);
@@ -84,33 +82,29 @@ public class InventoryHandler {
 
 	/**
 	 * Restore the player's inventory back to them.
-	 * 
-	 * @throws IOException
-	 * @throws InvalidConfigurationException
 	 */
-	public void restoreInventory(Player p) throws IOException,
-			InvalidConfigurationException {
+	@SuppressWarnings("unchecked")
+	public void restoreInventory(Player p) {
 		UUID uuid = p.getUniqueId();
 
 		// Grab disk file
 		File file = new File(dir, uuid.toString());
+		JsonConfiguration json = new JsonConfiguration(dir, uuid.toString());
 
 		// Try to grab the items from memory first
-		ItemStack[] items = this.items.remove(p);
-		ItemStack[] armor = this.armor.remove(p);
+		ItemStack[] items = this.items.remove(p.getName());
+		ItemStack[] armor = this.armor.remove(p.getName());
 
 		// If we can't restore from memory, restore from file
 		if (items == null || armor == null) {
-			YamlConfiguration config = new YamlConfiguration();
-			config.load(file);
-
-			// Get the items and armor lists
-			List<?> itemsList = config.getList("items");
-			List<?> armorList = config.getList("armor");
+			JSONArray itemsList = (JSONArray) json.getValue("items");
+			JSONArray armorList = (JSONArray) json.getValue("armor");
 
 			// Turn the lists into arrays
-			items = itemsList.toArray(new ItemStack[itemsList.size()]);
-			armor = armorList.toArray(new ItemStack[armorList.size()]);
+			items = (ItemStack[]) itemsList.toArray(new ItemStack[itemsList
+					.size()]);
+			armor = (ItemStack[]) armorList.toArray(new ItemStack[armorList
+					.size()]);
 		}
 
 		// Set the player inventory contents
