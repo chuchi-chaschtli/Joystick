@@ -24,12 +24,60 @@
  */
 package com.valygard.aohruthless;
 
+import net.milkbowl.vault.economy.Economy;
+
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.valygard.aohruthless.messenger.JSLogger;
 
 /**
  * @author Anand
  * 
  */
 public class Joystick extends JavaPlugin {
+	// vault
+	private Economy econ;
+	private EconomyManager econManager;
 
+	public Economy getEconomy() {
+		return econ;
+	}
+	
+	public EconomyManager getEconomyManager() {
+		return econManager;
+	}
+	
+	@Override
+	public void onEnable() {
+		loadVault();
+		
+		init();
+	}
+	
+	private void loadVault() {
+		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
+		if (vault == null) {
+			JSLogger.getLogger().warn("Economy rewards cannot function without vault.");
+			return;
+		}
+
+		ServicesManager manager = this.getServer().getServicesManager();
+		RegisteredServiceProvider<Economy> e = manager
+				.getRegistration(net.milkbowl.vault.economy.Economy.class);
+
+		if (e != null) {
+			econ = e.getProvider();
+			JSLogger.getLogger().info("Vault v" + vault.getDescription().getVersion()
+					+ " has been found! Economy rewards enabled.");
+		} else {
+			JSLogger.getLogger().warn("Vault found, but no economy plugin detected ... Economy rewards will not function!");
+		}
+	}
+	
+	private void init() {
+		econManager = new EconomyManager(econ);
+	}
 }

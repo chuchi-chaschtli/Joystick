@@ -40,13 +40,14 @@ public class Messenger {
 
 	public static boolean tell(CommandSender p, String msg) {
 		// If the input sender is null or the string is empty, return.
-        if (p == null || msg.equals(" ")) {
-            return false;
-        }
+		if (p == null || msg.equals(" ")) {
+			return false;
+		}
 
-        // Otherwise, send the message with the plugin tag.
-        p.sendMessage(ChatColor.DARK_GRAY + "[Joystick] " + ChatColor.RESET + msg);
-        return true;
+		// Otherwise, send the message with the plugin tag.
+		p.sendMessage(ChatColor.DARK_GRAY + "[Joystick] " + ChatColor.RESET
+				+ msg);
+		return true;
 	}
 
 	public static boolean tell(CommandSender p, Message msg, String s) {
