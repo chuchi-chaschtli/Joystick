@@ -93,9 +93,9 @@ public interface Arena {
 	 * 
 	 * @param path
 	 *            a String configuration pathway.
-	 * @return a Spawnpoint based on the given path.
+	 * @return a Location based on the given path.
 	 */
-	public Spawnpoint getLocation(String path);
+	public Location getLocation(String path);
 
 	/**
 	 * Sets an important location in the warps sub-section of an arena.
@@ -442,16 +442,14 @@ public interface Arena {
 	public void moveToSpec(Player p);
 
 	/**
-	 * Give a player a class based on it's class name. We go through and check
-	 * the {@code ArenaClass} map in the {@code ArenaManager}, and then after a
-	 * series of checks give the player their desired class.
+	 * Gives a player a given ArenaClass object as their kit for the arena.
 	 * 
 	 * @param p
 	 *            the player who chose a class
-	 * @param classname
-	 *            the class chosen
+	 * @param arenaClass
+	 *            the chosen class
 	 */
-	public void pickClass(Player p, String classname);
+	public void pickClass(Player p, ArenaClass arenaClass);
 
 	/**
 	 * Compile the different classes, in which one is randomly selected. While
