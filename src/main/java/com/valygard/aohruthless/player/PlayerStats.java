@@ -21,22 +21,20 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
-import com.valygard.aohruthless.ArenaClass;
 import com.valygard.aohruthless.framework.Arena;
-import com.valygard.aohruthless.messenger.JSLogger;
 import com.valygard.aohruthless.timer.Conversion;
-import com.valygard.aohruthless.utils.config.ConfigUtils;
+import com.valygard.aohruthless.utils.config.JsonConfiguration;
 
 /**
  * @author Anand
  * 
  */
+@SuppressWarnings("unchecked")
 public class PlayerStats {
 
 	// The player
@@ -60,18 +58,13 @@ public class PlayerStats {
 	private int timespent;
 	private BukkitTask task;
 
-	// Class data of the player
-	private ConfigurationSection data;
-
 	// Directory where stats are stored.
 	private File dir;
 
-	// File in the directory, which is player-specific.
-	private File file;
-
-	// Config
-	private YamlConfiguration config;
-	private String path;
+	// config
+	private JsonConfiguration config;
+	private JSONObject arenaContents, classData;
+	private JSONArray arenaArray;
 
 	// The player's matchmaking rating. This is not used in this class but is
 	// setup by the player's configuration file.
@@ -102,52 +95,90 @@ public class PlayerStats {
 			return;
 		}
 
-		// Create disk YAML file
-		this.file = new File(dir, player.getUniqueId() + ".yml");
-		this.config = YamlConfiguration.loadConfiguration(file);
-		this.path = "arenas." + name + ".";
+		// create JSON disk file
+		this.config = new JsonConfiguration(dir, player.getUniqueId()
+				.toString());
 
-		if (file.exists()) {
-			try {
-				config.load(file);
+		this.arenaArray = (JSONArray) config.getValue("_" + name);
+		this.arenaContents = new JSONObject();
+		this.classData = new JSONObject();
+
+		// update initialization based on file status
+		if (arenaArray == null) {
+			arenaArray = new JSONArray();
+		} else {
+			arenaContents = (JSONObject) arenaArray.get(0);
+			if (arenaArray.size() > 1) {
+				classData = (JSONObject) arenaArray.get(1);
 			}
-			catch (InvalidConfigurationException e) {
-				JSLogger.getLogger().error(
-						"Could not load stats.yml for " + player.getName()
-								+ " - UUID: " + player.getUniqueId());
-				e.printStackTrace();
-			}
-			this.kills = config.getInt(path + "kills");
-			this.deaths = config.getInt(path + "deaths");
-
-			this.wins = config.getInt(path + "wins");
-			this.losses = config.getInt(path + "losses");
-			this.draws = config.getInt(path + "draws");
-
-			this.kdr = calculateRatio(kills, deaths);
-			this.wlr = calculateRatio(wins, draws + losses);
-
-			this.killstreak = config.getInt(path + "killstreak");
-			this.winstreak = config.getInt(path + "winstreak");
-
-			this.timespent = config.getInt(path + "time-spent");
-
-			this.data = ConfigUtils.makeSection(config, "arenas." + name
-					+ ".class-data");
 		}
-		config.set("player", player.getName());
 
-		if (config.get("mmr") == null) {
-			config.set(
+		this.kills = parseValue("kills");
+		this.deaths = parseValue("deaths");
+
+		this.wins = parseValue("wins");
+		this.losses = parseValue("losses");
+		this.draws = parseValue("draws");
+
+		this.kdr = calculateRatio(kills, deaths);
+		this.wlr = calculateRatio(wins, draws + losses);
+
+		this.killstreak = parseValue("killstreak");
+		this.winstreak = parseValue("winstreak");
+
+		this.timespent = parseValue("timeSpent");
+
+		config.write("playerName", player.getName());
+		if (config.getValue("mmr") == null) {
+			config.write(
 					"mmr",
 					arena.getPlugin().getConfig()
 							.getInt("global.starting-mmr", 1000));
 		}
-		this.mmr = config.getInt("mmr");
+		this.mmr = (int) config.getValue("mmr");
 
-		config.set(path + "kdr", kdr);
-		config.set(path + "wlr", wlr);
-		saveFile();
+		config.write("_" + name, reload());
+	}
+
+	/**
+	 * Reloads disk file
+	 * 
+	 * @return the updated JSONArray
+	 */
+	private JSONArray reload() {
+		arenaContents.clear();
+		arenaContents.put("kills", kills);
+		arenaContents.put("deaths", deaths);
+		arenaContents.put("killDeathRatio", kdr);
+		arenaContents.put("wins", wins);
+		arenaContents.put("losses", losses);
+		arenaContents.put("draws", draws);
+		arenaContents.put("winRatio", wlr);
+		arenaContents.put("killstreak", killstreak);
+		arenaContents.put("winstreak", winstreak);
+		arenaContents.put("timeSpent", timespent);
+
+		// TODO: reload class data
+		if (arenaArray.size() < 1) {
+			arenaArray.add(arenaContents);
+		} else {
+			arenaArray.set(0, arenaContents);
+		}
+		return arenaArray;
+	}
+
+	/**
+	 * Convenience method to assist integer parsing
+	 * 
+	 * @param key
+	 * @return
+	 */
+	private int parseValue(String key) {
+		Object obj = config.getValue(arenaContents.get(key));
+		if (obj == null || !(obj instanceof Integer)) {
+			return 0;
+		}
+		return (int) obj;
 	}
 
 	/**
@@ -166,129 +197,125 @@ public class PlayerStats {
 	 */
 	public void setMMR(int value) {
 		mmr = value;
-		config.set("mmr", value);
-		saveFile();
+		config.write("mmr", value);
 	}
 
 	/**
-	 * At the end of every arena, reset a player's killstreak.
+	 * Resets killstreak and writes changes to config.
 	 */
 	public void resetKillstreak() {
-		String s = "arenas." + name + ".killstreak";
-
 		killstreak = 0;
-		config.set(s, killstreak);
-		saveFile();
+		arenaContents.put("killstreak", 0);
+		arenaArray.set(0, arenaContents);
+		config.write("_" + name, arenaArray);
 	}
 
 	/**
-	 * Reset the winstreak for a player.
+	 * Resets winstreak and writes changes to config.
 	 */
 	public void resetWinstreak() {
-		String s = "arenas." + name + ".winstreak";
-
 		winstreak = 0;
-		config.set(s, winstreak);
-		saveFile();
+		arenaContents.put("winstreak", 0);
+		arenaArray.set(0, arenaContents);
+		config.write("_" + name, arenaArray);
 	}
 
 	/**
 	 * Whenever a player gets a kill, win, loss, draw, or death, we increment
-	 * that individual setting and save it to the config.
+	 * that individual setting and save it to the config. Other values must be
+	 * changed accordingly (i.e, when a player dies their deaths is incremented
+	 * and killstreak is 0)
 	 * 
-	 * @param path
+	 * @param key
+	 *            the value type to increment
 	 */
-	public void increment(String path) {
+	public void evaluate(String key) {
 		if (!tracking) {
 			return;
 		}
-		String s = this.path + path;
 
-		switch (path) {
+		switch (key) {
 		case "kills":
 			kills += 1;
-			config.set(s, kills);
-
 			killstreak += 1;
-			config.set(this.path + "killstreak", killstreak);
+
+			arenaContents.put("kills", kills);
+			arenaContents.put("killstreak", killstreak);
 			break;
 		case "deaths":
 			deaths += 1;
-			config.set(s, deaths);
-
 			killstreak = 0;
-			config.set(this.path + "killstreak", killstreak);
+
+			arenaContents.put("deaths", deaths);
+			arenaContents.put("killstreak", killstreak);
 			break;
 		case "wins":
 			wins += 1;
-			config.set(s, wins);
-
 			winstreak += 1;
-			config.set(this.path + "winstreak", winstreak);
+
+			arenaContents.put("wins", wins);
+			arenaContents.put("winstreak", winstreak);
 			break;
 		case "losses":
 			losses += 1;
-			config.set(s, losses);
-
 			winstreak = 0;
-			config.set(this.path + "winstreak", winstreak);
+
+			arenaContents.put("losses", losses);
+			arenaContents.put("winstreak", winstreak);
 			break;
 		case "draws":
 			draws += 1;
-			config.set(s, draws);
-
 			winstreak = 0;
-			config.set(this.path + "winstreak", winstreak);
+
+			arenaContents.put("draws", draws);
+			arenaContents.put("winstreak", winstreak);
 			break;
 		default:
 			throw new IllegalArgumentException(
 					"Expected: kills, deaths, wins, losses, or draws");
 		}
-		saveFile();
 		// Recalculate the ratios of the kdr and wlr.
 		recalibrate();
+		// write changes to file
+		arenaArray.set(0, arenaContents);
+		config.write("_" + name, arenaArray);
 	}
 
 	/**
-	 * Calculate the ratio of two integers, such as kills v. deaths or wins v.
-	 * losses
+	 * Calculates the ratio of two integers. If the divisor is less than or
+	 * equal to 1, the dividend is the ratio returned. If the dividend divided
+	 * by the divisor equates to a negative integer, 0.00 is returned.
 	 * 
-	 * @param x
-	 * @param y
-	 * @return
+	 * @param dividend
+	 *            the int to divide
+	 * @param divisor
+	 *            the int to divide by
+	 * @return a double quotient
 	 */
-	public double calculateRatio(int x, int y) {
-		if (y <= 1) return x;
-		if (x / y < 0) return 0;
+	public double calculateRatio(int dividend, int divisor) {
+		if (divisor <= 1) return dividend * 1D;
+		if (dividend / divisor < 0) return 0D;
 		DecimalFormat df = new DecimalFormat("#.###");
-		return Double.valueOf(df.format(x / (y * 1.0)));
+		return Double.valueOf(df.format(dividend / (divisor * 1.0)));
 	}
 
 	/**
-	 * Recalibrating involves loading the config file then calculating the
-	 * ratios. It then saves the ratios to the configuration file.
+	 * Helper method to reevaluate {@code kdr} and {@code wlr}
 	 */
-	public void recalibrate() {
+	private void recalibrate() {
 		kdr = calculateRatio(kills, deaths);
-		config.set("arenas." + name + ".kdr", kdr);
+		arenaContents.put("killDeathRatio", kdr);
 
 		wlr = calculateRatio(wins, draws + losses);
-		config.set("arenas." + name + ".wlr", wlr);
-		saveFile();
+		arenaContents.put("winRatio", wlr);
 	}
 
 	/**
-	 * Add time to the player's time spent in the arena.
-	 * 
-	 */
-	private void addTime() {
-		timespent++;
-		config.set(path + "time-spent", timespent);
-		saveFile();
-	}
-
-	/**
-	 * Tracks time spent in arena. Runs every second and adds time accordingly.
+	 * Increments time played by appropriate amount. Called every 20 ticks.
+	 * <p>
+	 * Note that changes to config are not written until the timer is
+	 * terminated. Only the time-cycle in memory is updated every second, with
+	 * changes to config being written after the conclusion of the arena.
 	 */
 	public void startTiming() {
 		if (!tracking) return;
@@ -297,36 +324,20 @@ public class PlayerStats {
 				new Runnable() {
 
 					public void run() {
+						timespent++;
 						if (!arena.isRunning()) {
 							task.cancel();
+							arenaContents.put("timeSpent", timespent);
+							arenaArray.set(0, arenaContents);
+							config.write("_" + name, arenaArray);
 							return;
 						}
-						addTime();
 					}
 				}, 20l, 20l);
 	}
 
-	public void collectClassData() {
-		ArenaClass ac = arena.getClass(player);
-		data.set(ac.getLowercaseName(), data.getInt(ac.getLowercaseName()) + 1);
-		saveFile();
-	}
-
-	private void saveFile() {
-		try {
-			config.save(file);
-		}
-		catch (IOException e) {
-			JSLogger.getLogger().error(
-					"Could not save stats for player '" + player.getName()
-							+ "'.");
-			e.printStackTrace();
-		}
-	}
-
-	public File getPlayerFile() {
-		return file;
-	}
+	// TODO: Accurately handle class data and document
+	public void collectClassData() {}
 
 	public Player getPlayer() {
 		return player;
@@ -384,16 +395,11 @@ public class PlayerStats {
 		return Conversion.formatIntoSentence(timespent);
 	}
 
-	public ConfigurationSection getClassData() {
-		return data;
-	}
-
 	public boolean isTracking() {
 		return tracking;
 	}
 
-	public boolean setTracking(boolean value) {
+	public void setTracking(boolean value) {
 		tracking = value;
-		return tracking;
 	}
 }
