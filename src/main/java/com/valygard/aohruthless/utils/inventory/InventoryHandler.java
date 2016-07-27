@@ -72,8 +72,16 @@ public class InventoryHandler {
 		JsonConfiguration json = new JsonConfiguration(dir, uuid.toString());
 		json.write(new String[] { "last-known-username", "uuid" },
 				new String[] { name, uuid.toString() });
-		json.write("items", new JSONArray().addAll(Arrays.asList(items)));
-		json.write("armor", new JSONArray().addAll(Arrays.asList(armor)));
+
+		JSONArray contents = new JSONArray();
+
+		contents.addAll(Arrays.asList(items));
+		json.write("items", contents);
+
+		contents.clear();
+		contents.addAll(Arrays.asList(armor));
+		json.write("armor", contents);
+		contents.clear();
 
 		// And clear the inventory
 		InventoryUtils.clearInventory(p);
@@ -83,7 +91,6 @@ public class InventoryHandler {
 	/**
 	 * Restore the player's inventory back to them.
 	 */
-	@SuppressWarnings("unchecked")
 	public void restoreInventory(Player p) {
 		UUID uuid = p.getUniqueId();
 
@@ -101,10 +108,8 @@ public class InventoryHandler {
 			JSONArray armorList = (JSONArray) json.getValue("armor");
 
 			// Turn the lists into arrays
-			items = (ItemStack[]) itemsList.toArray(new ItemStack[itemsList
-					.size()]);
-			armor = (ItemStack[]) armorList.toArray(new ItemStack[armorList
-					.size()]);
+			items = (ItemStack[]) itemsList.toArray();
+			armor = (ItemStack[]) armorList.toArray();
 		}
 
 		// Set the player inventory contents

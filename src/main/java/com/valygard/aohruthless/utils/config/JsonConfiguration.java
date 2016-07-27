@@ -45,6 +45,7 @@ public class JsonConfiguration {
 
 	// json
 	private final JSONParser parser;
+	private JSONObject obj;
 
 	private FileReader reader;
 
@@ -71,12 +72,17 @@ public class JsonConfiguration {
 		this.parser = new JSONParser();
 
 		try {
-			file.createNewFile();
+			if (file.createNewFile()) {
+				this.obj = new JSONObject();
+			} else {
+				this.obj = (JSONObject) parser.parse(initReader());
+			}
 		}
-		catch (IOException e) {
+		catch (IOException | ParseException e) {
 			JSLogger.getLogger().error(
-					"Could not create JSON file '" + fileName + "'!");
+					"Could not parse JSON file '" + fileName + "'!");
 			e.printStackTrace();
+			this.obj = new JSONObject();
 		}
 		initReader();
 	}
@@ -136,7 +142,6 @@ public class JsonConfiguration {
 		Validate.isTrue(keys.length == values.length,
 				"Could not write to JSON file " + fileName + "!");
 
-		JSONObject obj = new JSONObject();
 		for (int i = 0; i < keys.length; i++) {
 			obj = appendKey(obj, keys[i], values[i]);
 		}
@@ -161,15 +166,6 @@ public class JsonConfiguration {
 	 * @return an Object
 	 */
 	public Object getValue(String key) {
-		try {
-			JSONObject obj = (JSONObject) parser.parse(initReader());
-			return obj.get(key);
-		}
-		catch (IOException | ParseException e) {
-			JSLogger.getLogger().error(
-					"Could not parse JSON file '" + fileName + "'!");
-			e.printStackTrace();
-			return null;
-		}
+		return obj.get(key);
 	}
 }
