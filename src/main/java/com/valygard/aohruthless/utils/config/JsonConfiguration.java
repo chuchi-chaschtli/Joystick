@@ -49,6 +49,10 @@ public class JsonConfiguration {
 	private final JSONParser parser;
 	private JSONObject obj;
 
+	// formatting
+	private final Gson gson;
+
+	// file reader
 	private FileReader reader;
 
 	/**
@@ -72,6 +76,7 @@ public class JsonConfiguration {
 		}
 		this.file = new File(dir, fileName);
 		this.parser = new JSONParser();
+		this.gson = new GsonBuilder().setPrettyPrinting().create();
 
 		try {
 			if (file.createNewFile()) {
@@ -108,12 +113,6 @@ public class JsonConfiguration {
 		return reader;
 	}
 
-	@SuppressWarnings("unchecked")
-	private JSONObject appendKey(JSONObject obj, String key, Object value) {
-		obj.put(key, value);
-		return obj;
-	}
-
 	/**
 	 * Writes a single key and value to the json file, because there are cases
 	 * in which it is unnecessary to map an entire array.
@@ -140,22 +139,22 @@ public class JsonConfiguration {
 	 *            the Object[] values
 	 * @return the JsonConfiguration instance
 	 */
+	@SuppressWarnings("unchecked")
 	public JsonConfiguration write(String[] keys, Object[] values) {
 		Validate.isTrue(keys.length == values.length,
-				"Could not write to JSON file " + fileName + "!");
+				"Could not write to JSON file '" + fileName + "'!");
 
 		for (int i = 0; i < keys.length; i++) {
-			obj = appendKey(obj, keys[i], values[i]);
+			obj.put(keys[i], values[i]);
 		}
 
 		// try-with-resources to properly flush and close file
 		try (FileWriter writer = new FileWriter(file)) {
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		    writer.write(gson.toJson(obj));
+			writer.write(gson.toJson(obj));
 		}
 		catch (IOException e) {
 			JSLogger.getLogger().error(
-					"Could not write to JSON file " + fileName + "!");
+					"Could not write to JSON file '" + fileName + "'!");
 			e.printStackTrace();
 		}
 		return this;
