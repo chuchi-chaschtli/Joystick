@@ -27,6 +27,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.valygard.aohruthless.messenger.JSLogger;
 
 /**
@@ -148,7 +150,8 @@ public class JsonConfiguration {
 
 		// try-with-resources to properly flush and close file
 		try (FileWriter writer = new FileWriter(file)) {
-			writer.write(obj.toJSONString());
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		    writer.write(gson.toJson(obj));
 		}
 		catch (IOException e) {
 			JSLogger.getLogger().error(
