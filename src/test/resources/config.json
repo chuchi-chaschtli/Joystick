@@ -1,10 +1,9 @@
 {
-  "hello": "world",
-  "aoh": "ruthless",
-  "object-array": [
-    3.14,
-    7,
-    15.0,
-    "hello world"
+  "_default": [
+    {
+      "deaths": 4,
+      "kills": 5,
+      "wins": 0
+    }
   ]
 }

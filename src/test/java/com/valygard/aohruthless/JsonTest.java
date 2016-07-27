@@ -17,9 +17,9 @@
 package com.valygard.aohruthless;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.valygard.aohruthless.utils.config.JsonConfiguration;
 
@@ -29,27 +29,56 @@ import com.valygard.aohruthless.utils.config.JsonConfiguration;
  */
 public class JsonTest {
 
+	/**
+	 * Testing array read/write
+	 * 
+	 * @param args
+	 */
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		Object[] array = new Object[] { 3.14, 7, 15f, "hello world" };
-
 		JsonConfiguration config = new JsonConfiguration(new File(
 				"src/test/resources"), "config.json");
-		config.write("hello", "world");
 
-		JSONArray jArray = new JSONArray();
-		jArray.addAll(Arrays.asList(array));
-
-		config.write(new String[] { "aoh", "object-array" }, new Object[] {
-				"ruthless", jArray });
-
-		jArray = (JSONArray) config.getValue("object-array");
-		
-		Object[] objects = jArray.toArray();
-		// OUTPUT: 3.14 7 15.0 hello world
-		// success :)
-		for (Object obj : objects) {
-			System.out.print(obj + " ");
+		// init
+		JSONArray array = (JSONArray) config.getValue("_default");
+		JSONObject object = new JSONObject();
+		if (array == null) {
+			array = new JSONArray();
+		} else {
+			object = (JSONObject) array.get(0);
 		}
+
+		// initial values
+		object.put("kills", 5);
+		object.put("deaths", 4);
+		// determine if parseValue() functions correctly
+		object.put("wins", parseValue(config, object, "wins"));
+
+		// reload
+		if (array.size() < 1) {
+			array.add(object);
+		} else {
+			array.set(0, object);
+		}
+
+		// write
+		config.write("_default", array);
+	}
+
+	/**
+	 * Attempts to parse object keys to int values, null -> 0
+	 * 
+	 * @param config
+	 * @param object
+	 * @param key
+	 * @return
+	 */
+	private static int parseValue(JsonConfiguration config, JSONObject object,
+			String key) {
+		Object obj = config.getValue(object.get(key));
+		if (obj == null || !(obj instanceof Integer)) {
+			return 0;
+		}
+		return (int) obj;
 	}
 }

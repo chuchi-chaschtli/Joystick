@@ -79,7 +79,8 @@ public class JsonConfiguration {
 		this.gson = new GsonBuilder().setPrettyPrinting().create();
 
 		try {
-			if (file.createNewFile()) {
+			// hacky operation to determine if file is blank
+			if (file.createNewFile() || file.length() <= 0) {
 				this.obj = new JSONObject();
 			} else {
 				this.obj = (JSONObject) parser.parse(initReader());
@@ -88,7 +89,6 @@ public class JsonConfiguration {
 		catch (IOException | ParseException e) {
 			JSLogger.getLogger().error(
 					"Could not parse JSON file '" + fileName + "'!");
-			e.printStackTrace();
 			this.obj = new JSONObject();
 		}
 		initReader();
@@ -161,13 +161,13 @@ public class JsonConfiguration {
 	}
 
 	/**
-	 * Grabs an object value given a string pathway
+	 * Grabs an object value with a json object pathway
 	 * 
 	 * @param key
-	 *            the String path to the value
+	 *            the Object path to the value
 	 * @return an Object
 	 */
-	public Object getValue(String key) {
+	public Object getValue(Object key) {
 		return obj.get(key);
 	}
 }
