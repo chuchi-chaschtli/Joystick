@@ -19,11 +19,14 @@ package com.valygard.aohruthless.framework.spawn;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.Vector;
 
 import com.valygard.aohruthless.utils.config.LocationSerializer;
 
 /**
- * Spawnpoint container handles all arena locations for various player spawns
+ * Spawnpoint container handles all arena locations for various player spawns.
+ * Spawnpoints are immutable and cannot be modified externally. They serve
+ * primarily as a wrapper for arena locations.
  * 
  * @author Anand
  * 
@@ -37,7 +40,6 @@ public class Spawnpoint {
 	private final double x, y, z;
 	private final float yaw, pit;
 	private final World world;
-	private final Location location;
 
 	/**
 	 * Initializes a Spawnpoint from disk by deserializing a location from
@@ -54,7 +56,7 @@ public class Spawnpoint {
 	 */
 	public Spawnpoint(Spawn spawn, ConfigurationSection config, String path,
 			World world) {
-		this(spawn, LocationSerializer.deserializeLoc(config, path, world));
+		this(spawn, LocationSerializer.deserialize(config, path, world));
 	}
 
 	/**
@@ -69,7 +71,6 @@ public class Spawnpoint {
 	public Spawnpoint(Spawn spawn, Location loc) {
 		this.spawn = spawn;
 
-		this.location = loc;
 		this.x = Double.valueOf(LocationSerializer.toHundredths(loc.getX()));
 		this.y = Double.valueOf(LocationSerializer.toHundredths(loc.getY()));
 		this.z = Double.valueOf(LocationSerializer.toHundredths(loc.getZ()));
@@ -80,50 +81,125 @@ public class Spawnpoint {
 		this.world = loc.getWorld();
 	}
 
+	/**
+	 * Grabs the spawn type
+	 * 
+	 * @return Spawn enumeration
+	 */
 	public Spawn getSpawnType() {
 		return spawn;
 	}
 
-	public Location getLocation() {
-		return location;
+	public Vector toVector() {
+		return new Vector(x, y, z);
 	}
 
 	/**
-	 * Two spawnpoints are equal if and only if the underlying {@code spawn}
-	 * types are equal and if the two locations are equivalent
+	 * Creates a new location reference to the Spawnpoint attributes.
+	 * 
+	 * @return a Location
 	 */
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Spawnpoint) {
-			Spawnpoint spawn = (Spawnpoint) o;
-			return (spawn.getSpawnType() == this.spawn && location.equals(spawn
-					.getLocation()));
-		}
-		return false;
+	public Location toLocation() {
+		return new Location(world, x, y, z, yaw, pit);
+	}
+
+	public double getX() {
+		return x;
+	}
+
+	public double getY() {
+		return y;
+	}
+
+	public double getZ() {
+		return z;
+	}
+
+	public float getYaw() {
+		return yaw;
+	}
+
+	public float getPitch() {
+		return pit;
+	}
+
+	public World getWorld() {
+		return world;
 	}
 
 	@Override
 	public int hashCode() {
-		int hash = 7;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Float.floatToIntBits(pit);
+		result = prime * result + ((spawn == null) ? 0 : spawn.hashCode());
+		result = prime * result + ((world == null) ? 0 : world.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(x);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(y);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + Float.floatToIntBits(yaw);
+		temp = Double.doubleToLongBits(z);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
 
-		hash = 13 * hash + (spawn.hashCode());
-		hash = 13 * hash + (world != null ? world.hashCode() : 0);
-		hash = 13
-				* hash
-				+ (int) (Double.doubleToLongBits(x) ^ (Double
-						.doubleToLongBits(x) >>> 32));
-		hash = 13
-				* hash
-				+ (int) (Double.doubleToLongBits(y) ^ (Double
-						.doubleToLongBits(y) >>> 32));
-		hash = 13
-				* hash
-				+ (int) (Double.doubleToLongBits(z) ^ (Double
-						.doubleToLongBits(z) >>> 32));
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || !(obj instanceof Spawnpoint)) {
+			return false;
+		}
+		Spawnpoint other = (Spawnpoint) obj;
+		if (Float.floatToIntBits(pit) != Float.floatToIntBits(other.pit)) {
+			return false;
+		}
+		if (spawn != other.spawn) {
+			return false;
+		}
+		if (world == null) {
+			if (other.world != null) {
+				return false;
+			}
+		} else if (!world.equals(other.world)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y)) {
+			return false;
+		}
+		if (Float.floatToIntBits(yaw) != Float.floatToIntBits(other.yaw)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z)) {
+			return false;
+		}
+		return true;
+	}
 
-		hash = 13 * hash + (int) (Float.floatToIntBits(pit));
-		hash = 13 * hash + (int) (Float.floatToIntBits(yaw));
-
-		return hash;
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Spawnpoint [spawn=");
+		builder.append(spawn);
+		builder.append(", x=");
+		builder.append(x);
+		builder.append(", y=");
+		builder.append(y);
+		builder.append(", z=");
+		builder.append(z);
+		builder.append(", yaw=");
+		builder.append(yaw);
+		builder.append(", pit=");
+		builder.append(pit);
+		builder.append(", world=");
+		builder.append(world);
+		builder.append("]");
+		return builder.toString();
 	}
 }

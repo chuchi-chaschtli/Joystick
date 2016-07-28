@@ -16,8 +16,6 @@
  */
 package com.valygard.aohruthless.utils.config;
 
-import java.text.DecimalFormat;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -53,7 +51,7 @@ public class LocationSerializer {
 	 *            the world of the location
 	 * @return
 	 */
-	public static Location deserializeLoc(ConfigurationSection config,
+	public static Location deserialize(ConfigurationSection config,
 			String path, World world) {
 		String value = config.getString(path);
 		if (value == null) return null;
@@ -124,6 +122,6 @@ public class LocationSerializer {
 	 * @return a formatted String
 	 */
 	public static String toHundredths(double value) {
-		return new DecimalFormat("#.##").format(value);
+		return String.format("%.2f", value);
 	}
 }

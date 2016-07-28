@@ -16,7 +16,6 @@
  */
 package com.valygard.aohruthless.framework;
 
-import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -262,12 +261,12 @@ public interface Arena {
 	public PlayerStats getStats(Player p);
 
 	/**
-	 * Returns a List of all PlayerStats references currently stored in this
+	 * Returns a Set of all PlayerStats references currently stored in this
 	 * arena.
 	 * 
-	 * @return a read-only ArrayList
+	 * @return a read-only set
 	 */
-	public List<PlayerStats> getStats();
+	public Set<PlayerStats> getStats();
 
 	/**
 	 * Grabs the player's stored data model. Returns null if no data was found.

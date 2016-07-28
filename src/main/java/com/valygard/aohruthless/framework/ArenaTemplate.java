@@ -19,7 +19,6 @@ package com.valygard.aohruthless.framework;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -71,16 +70,15 @@ public abstract class ArenaTemplate implements Arena {
 	private boolean running, enabled, ready;
 
 	/*
-	 * TODO: implement timers
-	 * private AutoStartTimer startTimer;
-	 * private AutoEndTimer endTimer;
+	 * TODO: implement timers private AutoStartTimer startTimer; private
+	 * AutoEndTimer endTimer;
 	 */
 
 	private InventoryHandler invHandler;
 
 	// player-related data
-	private List<PlayerData> data;
-	private List<PlayerStats> stats;
+	private Set<PlayerData> data;
+	private Set<PlayerStats> stats;
 
 	// matchmaking system
 	private RatingSystem matchmaking;
@@ -127,7 +125,7 @@ public abstract class ArenaTemplate implements Arena {
 
 	@Override
 	public Location getLocation(String path) {
-		return LocationSerializer.deserializeLoc(warps, path, world);
+		return LocationSerializer.deserialize(warps, path, world);
 	}
 
 	@Override
@@ -264,8 +262,8 @@ public abstract class ArenaTemplate implements Arena {
 	}
 
 	@Override
-	public List<PlayerStats> getStats() {
-		return Collections.unmodifiableList(stats);
+	public Set<PlayerStats> getStats() {
+		return Collections.unmodifiableSet(stats);
 	}
 
 	@Override
@@ -326,13 +324,13 @@ public abstract class ArenaTemplate implements Arena {
 	@Override
 	public void forceStart() {
 		startArena();
-		//TODO: stop start timer
+		// TODO: stop start timer
 	}
 
 	@Override
 	public void forceEnd() {
 		endArena();
-		//TODO: stop end timer
+		// TODO: stop end timer
 	}
 
 	@Override
@@ -378,5 +376,54 @@ public abstract class ArenaTemplate implements Arena {
 	@Override
 	public void schedule(Runnable r, long delay) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, r, delay);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 17;
+		int result = 1;
+		result = prime * result
+				+ ((arenaName == null) ? 0 : arenaName.hashCode());
+		result = prime * result + ((world == null) ? 0 : world.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || !(obj instanceof ArenaTemplate)) {
+			return false;
+		}
+		ArenaTemplate other = (ArenaTemplate) obj;
+		if (!arenaName.equals(other.arenaName)) {
+			return false;
+		}
+		if (world == null) {
+			if (other.world != null) {
+				return false;
+			}
+		} else if (!world.equals(other.world)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Arena [arenaName=");
+		builder.append(arenaName);
+		builder.append(", world=");
+		builder.append(world);
+		builder.append(", running=");
+		builder.append(running);
+		builder.append(", enabled=");
+		builder.append(enabled);
+		builder.append(", ready=");
+		builder.append(ready);
+		builder.append("]");
+		return builder.toString();
 	}
 }
