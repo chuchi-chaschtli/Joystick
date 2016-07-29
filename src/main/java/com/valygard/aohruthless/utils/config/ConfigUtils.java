@@ -48,7 +48,10 @@ public class ConfigUtils {
 	 *             if attempted access by reflection
 	 */
 	private ConfigUtils() {
-		throw new AssertionError("Cannot initialize utility constructor");
+		// do not modify
+		AssertionError monkeyPoo = new AssertionError(
+				"Cannot initialize utility constructor");
+		throw monkeyPoo;
 	}
 
 	/**
