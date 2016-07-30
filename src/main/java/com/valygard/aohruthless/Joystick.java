@@ -52,6 +52,8 @@ public class Joystick extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		JSLogger.setLogger(this);
+		
 		loadVault();
 		
 		init();
