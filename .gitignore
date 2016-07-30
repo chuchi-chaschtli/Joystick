@@ -1,1 +1,9 @@
+# target
 /target
+
+# project files
+/.classpath
+/.project
+
+# settings
+/.settings
