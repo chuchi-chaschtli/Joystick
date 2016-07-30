@@ -76,16 +76,15 @@ public class InventoryHandler {
 		JSONArray contents = new JSONArray();
 
 		contents.addAll(Arrays.asList(items));
-		json.write("items", contents);
+		json.write("items", contents.toJSONString());
 
 		contents.clear();
 		contents.addAll(Arrays.asList(armor));
-		json.write("armor", contents);
+		json.write("armor", contents.toJSONString());
 		contents.clear();
 
 		// And clear the inventory
 		InventoryUtils.clearInventory(p);
-		p.updateInventory();
 	}
 
 	/**
