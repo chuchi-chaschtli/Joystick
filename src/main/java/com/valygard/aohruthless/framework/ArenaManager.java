@@ -257,7 +257,6 @@ public abstract class ArenaManager {
 				ConfigUtils.makeSection(section, "prizes"));
 
 		PermissionUtils.registerPermission(
-				plugin,
 				plugin.getClass().getName().toLowerCase() + ".arenas."
 						+ arenaName, PermissionDefault.TRUE).addParent(
 				plugin.getClass().getName().toLowerCase() + ".arenas", true);
@@ -278,8 +277,8 @@ public abstract class ArenaManager {
 		config.set("arenas." + name, null);
 		plugin.saveConfig();
 
-		PermissionUtils.unregisterPermission(plugin, plugin.getClass()
-				.getName().toLowerCase()
+		PermissionUtils.unregisterPermission(plugin.getClass().getName()
+				.toLowerCase()
 				+ ".arenas." + name);
 		JSLogger.getLogger().info("The arena '" + name + "' has been removed.");
 	}
@@ -418,7 +417,6 @@ public abstract class ArenaManager {
 
 		// Register the permission.
 		PermissionUtils.registerPermission(
-				plugin,
 				plugin.getClass().getName().toLowerCase() + ".classes."
 						+ lowercase, PermissionDefault.TRUE).addParent(
 				plugin.getClass().getName().toLowerCase() + "classes", true);
@@ -484,8 +482,8 @@ public abstract class ArenaManager {
 		// Remove the class from the map.
 		classes.remove(lowercase);
 
-		PermissionUtils.unregisterPermission(plugin, plugin.getClass()
-				.getName().toLowerCase()
+		PermissionUtils.unregisterPermission(plugin.getClass().getName()
+				.toLowerCase()
 				+ ".classes." + lowercase);
 	}
 
