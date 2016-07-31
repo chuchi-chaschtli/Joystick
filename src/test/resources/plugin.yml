@@ -1,5 +1,0 @@
-name: JSTest
-version: ${project.version}
-main: ${project.groupId}.InventoryHandlerTest
-description: ${project.description}
-author: AoH_Ruthless

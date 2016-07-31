@@ -1,5 +1,5 @@
 /**
- * InventoryHandlerTest.java is a part of Joystick
+ * InventoryTest.java is a part of Joystick
  *
  * Copyright (c) 2016 Anand Kumar
  *
@@ -16,53 +16,41 @@
  */
 package com.valygard.aohruthless;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
-import org.junit.Test;
+import java.io.File;
+import java.util.UUID;
 
+import org.bukkit.entity.Player;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.valygard.aohruthless.util.MockPlayerInventory;
+import com.valygard.aohruthless.util.MockUtils;
 import com.valygard.aohruthless.utils.inventory.InventoryHandler;
+
 
 /**
  * @author Anand
- * 
+ *
  */
-public class InventoryHandlerTest extends JavaPlugin implements Listener {
-
-	private InventoryHandler handler;
-	private BukkitTask task;
+@RunWith(PowerMockRunner.class)
+public class InventoryTest {
 	
-	// my MC account IGN
+	// default name
 	private static final String PLAYER_NAME = "AoH_Ruthless";
-
-	@Override
-	public void onEnable() {
-		handler = new InventoryHandler(this);
-		
-		task = getServer().getScheduler().runTaskTimer(this, new Runnable() {
-
-			public void run() {
-				if (Bukkit.getPlayer(PLAYER_NAME) != null) {
-					store();
-					task.cancel();
-				}
-			}
-		}, 20l, 20l);
-	}
+	// disk path
+	private static final String FILE_PATH = "src/test/resources/inventory";
 
 	@Test
 	public void store() {
-		final Player player = Bukkit.getPlayer(PLAYER_NAME);
-		handler.storeInventory(player);
-
-		getServer().getScheduler().runTaskLater(this, new Runnable() {
-
-			@Override
-			public void run() {
-				handler.restoreInventory(player);
-			}
-		}, 50l);
+		Player mockPlayer = MockUtils.getPlayer(PLAYER_NAME);
+		MockPlayerInventory mockInv = new MockPlayerInventory();
+		
+		Mockito.when(mockPlayer.getInventory()).thenReturn(mockInv);
+		Mockito.when(mockPlayer.getUniqueId()).thenReturn(UUID.randomUUID());
+		
+		InventoryHandler handler = new InventoryHandler(new File(FILE_PATH));
+		handler.storeInventory(mockPlayer);
 	}
 }

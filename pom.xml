@@ -30,35 +30,8 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			<!-- Test jar -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 
-		<!-- Testing -->
-		<testOutputDirectory>${project.build.directory}/test</testOutputDirectory>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
-		<testResources>
-			<!-- Test plugin.yml -->
-			<testResource>
-				<targetPath>.</targetPath>
-				<directory>${basedir}/src/test/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>plugin.yml</include>
-				</includes>
-			</testResource>
-		</testResources>
 
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<resources>
@@ -95,13 +68,30 @@
 			<version>1.9.4-R0.1-SNAPSHOT</version>
 		</dependency>
 
-		<dependency> <!-- Vault -->
+		<!-- Vault -->
+		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>Vault</artifactId>
 			<version>1.5.6</version>
 			<type>jar</type>
 			<scope>provided</scope>
 			<optional>true</optional>
+		</dependency>
+
+		<!-- Mockito -->
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>1.5.5</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>1.5.5</version>
+			<type>jar</type>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

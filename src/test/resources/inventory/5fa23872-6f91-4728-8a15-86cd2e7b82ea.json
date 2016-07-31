@@ -1,0 +1,60 @@
+{
+  "items": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    {
+      "type": 371,
+      "amount": 20,
+      "durability": 0
+    },
+    null,
+    null,
+    {
+      "type": 5,
+      "amount": 1,
+      "durability": 0
+    },
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "armor": [
+    null,
+    {
+      "type": 311,
+      "amount": 1,
+      "durability": 0
+    },
+    null,
+    null
+  ],
+  "last-known-username": "AoH_Ruthless",
+  "uuid": "5fa23872-6f91-4728-8a15-86cd2e7b82ea"
+}
