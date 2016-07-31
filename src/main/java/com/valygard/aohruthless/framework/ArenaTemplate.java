@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -30,7 +31,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.ArenaClass;
-import com.valygard.aohruthless.EconomyManager;
 import com.valygard.aohruthless.RatingSystem;
 import com.valygard.aohruthless.framework.spawn.Spawn;
 import com.valygard.aohruthless.framework.spawn.Spawnpoint;
@@ -39,7 +39,6 @@ import com.valygard.aohruthless.messenger.Messenger;
 import com.valygard.aohruthless.player.PlayerData;
 import com.valygard.aohruthless.player.PlayerStats;
 import com.valygard.aohruthless.utils.config.LocationSerializer;
-import com.valygard.aohruthless.utils.inventory.InventoryHandler;
 import com.valygard.aohruthless.utils.inventory.InventoryUtils;
 
 /**
@@ -74,19 +73,51 @@ public abstract class ArenaTemplate implements Arena {
 	 * AutoEndTimer endTimer;
 	 */
 
-	private InventoryHandler invHandler;
-
 	// player-related data
 	private Set<PlayerData> data;
 	private Set<PlayerStats> stats;
 
-	// matchmaking system
-	private RatingSystem matchmaking;
+	/**
+	 * Constructor initializes arenas through a provided plugin instance and a
+	 * String arenaName, which serves as a unique identifier.
+	 * <p>
+	 * This constructor only provides the backbone for the ArenaTemplate. In all Arena
+	 * child classes, valid instances of timers, economy/vault handlers, and
+	 * inventory handlers must be instantiated.
+	 * 
+	 * @param plugin
+	 *            the Plugin instance
+	 * @param arenaName
+	 *            a String identifier
+	 */
+	public ArenaTemplate(Plugin plugin, String arenaName) {
+		// General stuff
+		this.plugin = plugin;
+		this.arenaName = arenaName;
 
-	// economy
-	private EconomyManager econManager;
+		// Settings from config
+		this.config = plugin.getConfig();
+		this.settings = config.getConfigurationSection("arenas." + arenaName
+				+ ".settings");
+		this.warps = config.getConfigurationSection("arenas." + arenaName
+				+ ".warps");
 
-	// TODO: CONSTRUCTOR
+		this.world = Bukkit.getWorld(settings.getString("world"));
+
+		Validate.notNull(world, "Error! World '" + settings.getString("world")
+				+ "' does not exist!");
+
+		this.minPlayers = settings.getInt("min-players");
+		this.maxPlayers = settings.getInt("max-players");
+
+		this.arenaPlayers = new HashSet<>();
+		this.lobbyPlayers = new HashSet<>();
+		this.specPlayers = new HashSet<>();
+
+		this.running = false;
+		this.enabled = settings.getBoolean("enabled", true);
+		this.ready = false;
+	}
 
 	@Override
 	public Plugin getPlugin() {
@@ -236,9 +267,7 @@ public abstract class ArenaTemplate implements Arena {
 	}
 
 	@Override
-	public RatingSystem getRatingSystem() {
-		return matchmaking;
-	}
+	public abstract RatingSystem getRatingSystem();
 
 	@Override
 	public PlayerStats getStats(Player p) {
