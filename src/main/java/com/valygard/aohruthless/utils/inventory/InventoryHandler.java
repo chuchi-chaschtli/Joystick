@@ -44,7 +44,11 @@ public class InventoryHandler {
 	private final Map<String, ItemStack[]> items, armor;
 
 	public InventoryHandler(Plugin plugin) {
-		this.dir = new File(plugin.getDataFolder(), "inventories");
+		this(new File(plugin.getDataFolder(), "inventories"));
+	}
+
+	public InventoryHandler(File dir) {
+		this.dir = dir;
 		this.dir.mkdir();
 
 		this.items = new HashMap<>();
@@ -74,14 +78,15 @@ public class InventoryHandler {
 				new String[] { name, uuid.toString() });
 
 		JSONArray contents = new JSONArray();
+		JSONArray armorContents = new JSONArray();
 
 		contents.addAll(Arrays.asList(items));
-		json.write("items", contents.toJSONString());
+
+		armorContents.addAll(Arrays.asList(armor));
+		json.write("items", contents).write("armor", armorContents);
 
 		contents.clear();
-		contents.addAll(Arrays.asList(armor));
-		json.write("armor", contents.toJSONString());
-		contents.clear();
+		armorContents.clear();
 
 		// And clear the inventory
 		InventoryUtils.clearInventory(p);

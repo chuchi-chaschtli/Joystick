@@ -150,9 +150,9 @@ public class JsonConfiguration {
 
 		// try-with-resources to properly flush and close file
 		try (FileWriter writer = new FileWriter(file)) {
-			writer.write(gson.toJson(parser.parse(obj.toJSONString())));
+			writer.write(gson.toJson(obj));
 		}
-		catch (IOException | ParseException e) {
+		catch (IOException e) {
 			JSLogger.getLogger().error(
 					"Could not write to JSON file '" + fileName + "'!");
 			e.printStackTrace();
