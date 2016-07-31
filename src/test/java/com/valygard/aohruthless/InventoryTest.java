@@ -29,27 +29,26 @@ import com.valygard.aohruthless.util.MockPlayerInventory;
 import com.valygard.aohruthless.util.MockUtils;
 import com.valygard.aohruthless.utils.inventory.InventoryHandler;
 
-
 /**
  * @author Anand
- *
+ * 
  */
 @RunWith(PowerMockRunner.class)
 public class InventoryTest {
-	
+
 	// default name
 	private static final String PLAYER_NAME = "AoH_Ruthless";
 	// disk path
 	private static final String FILE_PATH = "src/test/resources/inventory";
 
 	@Test
-	public void store() {
+	public void testStoreInventory() {
 		Player mockPlayer = MockUtils.getPlayer(PLAYER_NAME);
 		MockPlayerInventory mockInv = new MockPlayerInventory();
-		
+
 		Mockito.when(mockPlayer.getInventory()).thenReturn(mockInv);
 		Mockito.when(mockPlayer.getUniqueId()).thenReturn(UUID.randomUUID());
-		
+
 		InventoryHandler handler = new InventoryHandler(new File(FILE_PATH));
 		handler.storeInventory(mockPlayer);
 	}
