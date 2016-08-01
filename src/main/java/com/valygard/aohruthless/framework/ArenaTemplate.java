@@ -68,10 +68,9 @@ public abstract class ArenaTemplate implements Arena {
 	// arena flags
 	private boolean running, enabled, ready;
 
-	/*
-	 * TODO: implement timers private AutoStartTimer startTimer; private
-	 * AutoEndTimer endTimer;
-	 */
+	// TODO: implement timers
+	// private AutoStartTimer startTimer;
+	// private AutoEndTimer endTimer;
 
 	// player-related data
 	private Set<PlayerData> data;
@@ -81,9 +80,9 @@ public abstract class ArenaTemplate implements Arena {
 	 * Constructor initializes arenas through a provided plugin instance and a
 	 * String arenaName, which serves as a unique identifier.
 	 * <p>
-	 * This constructor only provides the backbone for the ArenaTemplate. In all Arena
-	 * child classes, valid instances of timers, economy/vault handlers, and
-	 * inventory handlers must be instantiated.
+	 * This constructor only provides the backbone for the ArenaTemplate. In all
+	 * Arena child classes, valid instances of timers, economy/vault handlers,
+	 * and inventory handlers must be instantiated.
 	 * 
 	 * @param plugin
 	 *            the Plugin instance
@@ -411,32 +410,23 @@ public abstract class ArenaTemplate implements Arena {
 	public int hashCode() {
 		final int prime = 17;
 		int result = 1;
-		result = prime * result
-				+ ((arenaName == null) ? 0 : arenaName.hashCode());
+		result = prime * result + arenaName.hashCode();
 		result = prime * result + ((world == null) ? 0 : world.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+
+		// Arenas are equal if they have same name identifier
+		if (obj instanceof ArenaTemplate
+				&& ((ArenaTemplate) obj).arenaName.equals(arenaName))
 			return true;
-		}
-		if (obj == null || !(obj instanceof ArenaTemplate)) {
-			return false;
-		}
-		ArenaTemplate other = (ArenaTemplate) obj;
-		if (!arenaName.equals(other.arenaName)) {
-			return false;
-		}
-		if (world == null) {
-			if (other.world != null) {
-				return false;
-			}
-		} else if (!world.equals(other.world)) {
-			return false;
-		}
-		return true;
+
+		return false;
 	}
 
 	@Override
