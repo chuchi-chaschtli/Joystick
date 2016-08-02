@@ -31,7 +31,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.ArenaClass;
@@ -256,11 +255,6 @@ public abstract class ArenaManager {
 		ConfigUtils.addMissingRemoveObsolete(plugin, "prizes.yml",
 				ConfigUtils.makeSection(section, "prizes"));
 
-		PermissionUtils.registerPermission(
-				plugin.getClass().getName().toLowerCase() + ".arenas."
-						+ arenaName, PermissionDefault.TRUE).addParent(
-				plugin.getClass().getName().toLowerCase() + ".arenas", true);
-
 		// Load the arena
 		return (load ? loadArena(arenaName) : null);
 	}
@@ -277,9 +271,6 @@ public abstract class ArenaManager {
 		config.set("arenas." + name, null);
 		plugin.saveConfig();
 
-		PermissionUtils.unregisterPermission(plugin.getClass().getName()
-				.toLowerCase()
-				+ ".arenas." + name);
 		JSLogger.getLogger().info("The arena '" + name + "' has been removed.");
 	}
 
@@ -415,12 +406,6 @@ public abstract class ArenaManager {
 		arenaClass.setLeggings(leggings);
 		arenaClass.setBoots(boots);
 
-		// Register the permission.
-		PermissionUtils.registerPermission(
-				plugin.getClass().getName().toLowerCase() + ".classes."
-						+ lowercase, PermissionDefault.TRUE).addParent(
-				plugin.getClass().getName().toLowerCase() + "classes", true);
-
 		// Finally add the class to the classes map.
 		classes.put(lowercase, arenaClass);
 		return arenaClass;
@@ -481,10 +466,6 @@ public abstract class ArenaManager {
 
 		// Remove the class from the map.
 		classes.remove(lowercase);
-
-		PermissionUtils.unregisterPermission(plugin.getClass().getName()
-				.toLowerCase()
-				+ ".classes." + lowercase);
 	}
 
 	// --------------------------- //
