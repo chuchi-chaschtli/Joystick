@@ -127,6 +127,19 @@ public class Spawnpoint {
 		return world;
 	}
 
+	/**
+	 * Serializes the spawnpoint to config through a given Yaml configuration
+	 * pathway
+	 * 
+	 * @param section
+	 *            the ConfigurationSection
+	 * @param path
+	 *            the String path
+	 */
+	public void serialize(ConfigurationSection section, String path) {
+		LocationSerializer.serialize(section, path, toLocation());
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
