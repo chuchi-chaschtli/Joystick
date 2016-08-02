@@ -103,7 +103,7 @@ public class JSLogger {
 			String fileName = plugin.getConfig().getString("global.log-file");
 
 			if (fileName == null) {
-				fileName = plugin.getClass().getName().toLowerCase() + ".log";
+				fileName = "joystick.log";
 				plugin.getConfig().set("global.log-file", fileName);
 				plugin.saveConfig();
 			} else {
@@ -177,7 +177,7 @@ public class JSLogger {
 	}
 
 	/**
-	 * Sends a error message (by logging a message with level error to koth log
+	 * Sends a error message (by logging a message with level error to the log
 	 * file, severe to server console).
 	 * 
 	 * @param msg
