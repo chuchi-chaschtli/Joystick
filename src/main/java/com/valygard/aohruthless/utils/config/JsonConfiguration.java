@@ -113,7 +113,16 @@ public class JsonConfiguration {
 		}
 		return reader;
 	}
-	
+
+	/**
+	 * Writes a JSONArray to memory at a specified String key.
+	 * 
+	 * @param key
+	 *            the String pathway
+	 * @param array
+	 *            the JSONArray
+	 * @return the JSONConfiguration instance
+	 */
 	@SuppressWarnings("unchecked")
 	public JsonConfiguration writeArray(String key, JSONArray array) {
 		for (Object value : array) {
@@ -122,23 +131,68 @@ public class JsonConfiguration {
 		}
 		return writeObject(key, array);
 	}
-	
+
+	/**
+	 * Writes a boolean to memory at a specified String key.
+	 * 
+	 * @param key
+	 *            the String pathway
+	 * @param value
+	 *            a boolean flag
+	 * @return the JSONConfiguration instance
+	 */
 	public JsonConfiguration writeBoolean(String key, boolean value) {
 		return writeObject(key, value);
 	}
 
+	/**
+	 * Writes an integer to memory at a specified String key.
+	 * 
+	 * @param key
+	 *            the String pathway
+	 * @param value
+	 *            an integer
+	 * @return the JSONConfiguration instance
+	 */
 	public JsonConfiguration writeInt(String key, int value) {
 		return writeObject(key, value);
 	}
 
+	/**
+	 * Writes a float to memory at a specified String key.
+	 * 
+	 * @param key
+	 *            the String pathway
+	 * @param value
+	 *            a float
+	 * @return the JSONConfiguration instance
+	 */
 	public JsonConfiguration writeFloat(String key, float value) {
 		return writeObject(key, value);
 	}
 
+	/**
+	 * Writes a double to memory at a specified String key.
+	 * 
+	 * @param key
+	 *            the String pathway
+	 * @param value
+	 *            a double
+	 * @return the JSONConfiguration instance
+	 */
 	public JsonConfiguration writeDouble(String key, double value) {
 		return writeObject(key, value);
 	}
 
+	/**
+	 * Writes a String object to memory at a specified String key.
+	 * 
+	 * @param key
+	 *            the String pathway
+	 * @param value
+	 *            a String
+	 * @return the JSONConfiguration instance
+	 */
 	public JsonConfiguration writeString(String key, String value) {
 		return writeObject(key, value);
 	}
@@ -192,5 +246,90 @@ public class JsonConfiguration {
 	 */
 	public Object getValue(Object key) {
 		return obj.get(key);
+	}
+
+	/**
+	 * Grabs a JSONArray from a given key.
+	 * 
+	 * @param key
+	 *            the Object pathway
+	 * @return a valid JSONArray at the specified {@code key}, null otherwise
+	 */
+	public JSONArray getArray(Object key) {
+		if (obj.get(key) instanceof JSONArray) {
+			return (JSONArray) obj.get(key);
+		}
+		return null;
+	}
+
+	/**
+	 * Grabs a String from a given key.
+	 * 
+	 * @param key
+	 *            the Object pathway
+	 * @return a valid String object at the specified {@code key}, an empty
+	 *         string otherwise
+	 */
+	public String getString(Object key) {
+		if (obj.get(key) instanceof String) {
+			return (String) obj.get(key);
+		}
+		return "";
+	}
+
+	/**
+	 * Grabs a boolean from a given key.
+	 * 
+	 * @param key
+	 *            the Object pathway
+	 * @return a valid boolean at the specified {@code key}, false otherwise
+	 */
+	public boolean getBoolean(Object key) {
+		if (obj.get(key) instanceof Boolean) {
+			return (boolean) obj.get(key);
+		}
+		return false;
+	}
+
+	/**
+	 * Grabs a floating point from a given key.
+	 * 
+	 * @param key
+	 *            the Object pathway
+	 * @return a valid floating point at the specified {@code key}, 0F otherwise
+	 */
+	public float getFloat(Object key) {
+		if (obj.get(key) instanceof Float) {
+			return (float) obj.get(key);
+		}
+		return 0F;
+	}
+
+	/**
+	 * Grabs a double from a given key.
+	 * 
+	 * @param key
+	 *            the Object pathway
+	 * @return a valid double at the specified {@code key}, 0d otherwise
+	 */
+	public double getDouble(Object key) {
+		if (obj.get(key) instanceof Double) {
+			return (double) obj.get(key);
+		}
+		return 0D;
+	}
+
+	/**
+	 * Grabs an integer from a given key.
+	 * 
+	 * @param key
+	 *            the Object pathway
+	 * @return a valid integer at the specified {@code key}, 0 otherwise
+	 */
+	public int getInt(Object key) {
+		if (obj.get(key) instanceof Integer) {
+			return (int) obj.get(key);
+		}
+		return 0;
 	}
 }
