@@ -128,16 +128,16 @@ public class PlayerStats {
 
 		this.timespent = parseValue("timeSpent");
 
-		config.write("playerName", player.getName());
+		config.writeString("playerName", player.getName());
 		if (config.getValue("mmr") == null) {
-			config.write(
+			config.writeInt(
 					"mmr",
 					arena.getPlugin().getConfig()
 							.getInt("global.starting-mmr", 1000));
 		}
 		this.mmr = (int) config.getValue("mmr");
 
-		config.write("_" + name, reload());
+		config.writeObject("_" + name, reload());
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class PlayerStats {
 	 */
 	public void setMMR(int value) {
 		mmr = value;
-		config.write("mmr", value);
+		config.writeInt("mmr", value);
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class PlayerStats {
 		killstreak = 0;
 		arenaContents.put("killstreak", 0);
 		arenaArray.set(0, arenaContents);
-		config.write("_" + name, arenaArray);
+		config.writeObject("_" + name, arenaArray);
 	}
 
 	/**
@@ -217,7 +217,7 @@ public class PlayerStats {
 		winstreak = 0;
 		arenaContents.put("winstreak", 0);
 		arenaArray.set(0, arenaContents);
-		config.write("_" + name, arenaArray);
+		config.writeObject("_" + name, arenaArray);
 	}
 
 	/**
@@ -278,7 +278,7 @@ public class PlayerStats {
 		recalibrate();
 		// write changes to file
 		arenaArray.set(0, arenaContents);
-		config.write("_" + name, arenaArray);
+		config.writeObject("_" + name, arenaArray);
 	}
 
 	/**
@@ -329,7 +329,7 @@ public class PlayerStats {
 							task.cancel();
 							arenaContents.put("timeSpent", timespent);
 							arenaArray.set(0, arenaContents);
-							config.write("_" + name, arenaArray);
+							config.writeObject("_" + name, arenaArray);
 							return;
 						}
 					}

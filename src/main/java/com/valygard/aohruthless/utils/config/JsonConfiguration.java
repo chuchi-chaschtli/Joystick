@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -72,9 +74,7 @@ public class JsonConfiguration {
 		}
 		this.fileName = fileName;
 
-		if (!dir.exists()) {
-			dir.mkdir();
-		}
+		dir.mkdirs();
 		this.file = new File(dir, fileName);
 		this.parser = new JSONParser();
 		this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -113,25 +113,54 @@ public class JsonConfiguration {
 		}
 		return reader;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public JsonConfiguration writeArray(String key, JSONArray array) {
+		for (Object value : array) {
+			if (value == null) continue;
+			array.set(array.indexOf(value), JSONValue.toJSONString(value));
+		}
+		return writeObject(key, array);
+	}
+	
+	public JsonConfiguration writeBoolean(String key, boolean value) {
+		return writeObject(key, value);
+	}
+
+	public JsonConfiguration writeInt(String key, int value) {
+		return writeObject(key, value);
+	}
+
+	public JsonConfiguration writeFloat(String key, float value) {
+		return writeObject(key, value);
+	}
+
+	public JsonConfiguration writeDouble(String key, double value) {
+		return writeObject(key, value);
+	}
+
+	public JsonConfiguration writeString(String key, String value) {
+		return writeObject(key, value);
+	}
 
 	/**
 	 * Writes a single key and value to the json file using {@link #write(Map)}
 	 * 
 	 * @param key
-	 *            the Object path
+	 *            the String path
 	 * @param value
 	 *            the Object value to be associated with specified {@code key}
 	 * 
 	 * @return the JsonConfiguration instance
 	 */
-	public JsonConfiguration write(Object key, Object value) {
-		Map<Object, Object> result = new HashMap<>(1);
+	public JsonConfiguration writeObject(String key, Object value) {
+		Map<String, Object> result = new HashMap<>(1);
 		result.put(key, value);
 		return write(result);
 	}
 
 	/**
-	 * Writes a map of keys and values to the Json file. The map is a colelction
+	 * Writes a map of keys and values to the Json file. The map is a collection
 	 * of any object type. The underlying FileWriter attempts to parse the
 	 * current JSONObject to {@code gson} pretty printing standards.
 	 * 
@@ -144,9 +173,9 @@ public class JsonConfiguration {
 		obj.putAll(map);
 
 		try (FileWriter writer = new FileWriter(file)) {
-			writer.write(gson.toJson(obj));
+			writer.write(gson.toJson(parser.parse(obj.toJSONString())));
 		}
-		catch (IOException e) {
+		catch (IOException | ParseException e) {
 			JSLogger.getLogger().error(
 					"Could not write to JSON file '" + fileName + "'!");
 			e.printStackTrace();

@@ -74,16 +74,16 @@ public class InventoryHandler {
 		this.armor.put(name, armor);
 
 		JsonConfiguration json = new JsonConfiguration(dir, uuid.toString());
-		json.write(new String[] { "last-known-username", "uuid" },
-				new String[] { name, uuid.toString() });
+		json.writeString("last-known-username", name).writeString("uuid",
+				uuid.toString());
 
 		JSONArray contents = new JSONArray();
 		JSONArray armorContents = new JSONArray();
 
 		contents.addAll(Arrays.asList(items));
-
 		armorContents.addAll(Arrays.asList(armor));
-		json.write("items", contents).write("armor", armorContents);
+		
+		json.writeArray("items", contents).writeArray("armor", armorContents);
 
 		contents.clear();
 		armorContents.clear();
