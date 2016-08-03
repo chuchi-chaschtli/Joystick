@@ -28,14 +28,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 /**
+ * No longer in use
+ * 
  * @author Anand
  * 
  */
+@Deprecated
 public class MockPlayerInventory implements PlayerInventory {
 
 	ItemStack[] armorContents = new ItemStack[4];
 	ItemStack[] contents = new ItemStack[36];
-	
+
 	/**
 	 * Default contents for testing
 	 */
