@@ -21,8 +21,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.lang.Validate;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -114,41 +115,34 @@ public class JsonConfiguration {
 	}
 
 	/**
-	 * Writes a single key and value to the json file, because there are cases
-	 * in which it is unnecessary to map an entire array.
+	 * Writes a single key and value to the json file using {@link #write(Map)}
 	 * 
 	 * @param key
-	 *            the String path
+	 *            the Object path
 	 * @param value
 	 *            the Object value to be associated with specified {@code key}
 	 * 
 	 * @return the JsonConfiguration instance
 	 */
-	public JsonConfiguration write(String key, Object value) {
-		return write(new String[] { key }, new Object[] { value });
+	public JsonConfiguration write(Object key, Object value) {
+		Map<Object, Object> result = new HashMap<>(1);
+		result.put(key, value);
+		return write(result);
 	}
 
 	/**
-	 * Writes a mapping of keys and values to the json file. The size of the
-	 * arrays must be the same value. Each key will be mapped to it's
-	 * corresponding value.
+	 * Writes a map of keys and values to the Json file. The map is a colelction
+	 * of any object type. The underlying FileWriter attempts to parse the
+	 * current JSONObject to {@code gson} pretty printing standards.
 	 * 
-	 * @param keys
-	 *            the String[] paths
-	 * @param value
-	 *            the Object[] values
+	 * @param map
+	 *            a Map of object keys and values
 	 * @return the JsonConfiguration instance
 	 */
 	@SuppressWarnings("unchecked")
-	public JsonConfiguration write(String[] keys, Object[] values) {
-		Validate.isTrue(keys.length == values.length,
-				"Could not write to JSON file '" + fileName + "'!");
+	public JsonConfiguration write(Map<?, ?> map) {
+		obj.putAll(map);
 
-		for (int i = 0; i < keys.length; i++) {
-			obj.put(keys[i], values[i]);
-		}
-
-		// try-with-resources to properly flush and close file
 		try (FileWriter writer = new FileWriter(file)) {
 			writer.write(gson.toJson(obj));
 		}
