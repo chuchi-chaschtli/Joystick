@@ -19,9 +19,11 @@ package com.valygard.aohruthless.command;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
@@ -29,20 +31,36 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.valygard.aohruthless.messenger.JSLogger;
 import com.valygard.aohruthless.messenger.Messenger;
 import com.valygard.aohruthless.messenger.Msg;
 import com.valygard.aohruthless.utils.PermissionUtils;
 
 /**
+ * Handler to process all commands. All commands are processed through
+ * annotations, and proper annotations much be appended to each class
+ * declaration. The command name is common to all commands, and annotated
+ * classes serve as subcommands to the main command.
+ * <p>
+ * Using the CommandHandler is very simple. It is merely the task of properly
+ * registering subcommand classes (by using proper annotation). When a command
+ * is processe, the {@code execute} method for the underlying sub command is
+ * called. If something is wrong, such as a misusage or lack of permission, a
+ * message is sent to the command user for easy problem resolution.
+ * </p>
+ * <p>
+ * Methods of command classes are not handled and all helper methods and
+ * subclasses will not be parsed. Similarly, commands are processed using
+ * no-args constructors, so be sure not to use injectors which may violate this.
+ * </p>
+ * 
  * @author Anand
  * 
  */
-public class CommandHandler implements CommandExecutor {
+public abstract class CommandHandler implements CommandExecutor {
 
-	private Plugin plugin;
+	protected Plugin plugin;
 
-	private Map<String, Command> commands;
+	protected Map<String, Command> commands = new LinkedHashMap<>();
 
 	/**
 	 * Constructor for Joystick command manager initializes by main class
@@ -63,29 +81,13 @@ public class CommandHandler implements CommandExecutor {
 		String first = (args.length > 0 ? args[0] : "");
 		String last = (args.length > 0 ? args[args.length - 1] : "");
 
-		if (first.toLowerCase().startsWith("ver")) {
-			StringBuilder foo = new StringBuilder();
-			foo.append("\n");
-			foo.append(ChatColor.DARK_GREEN).append("Author: ")
-					.append(ChatColor.RESET)
-					.append(plugin.getDescription().getAuthors()).append("\n");
-			foo.append(ChatColor.DARK_GREEN).append("Version: ")
-					.append(ChatColor.RESET)
-					.append(plugin.getDescription().getVersion()).append("\n");
-			foo.append(ChatColor.DARK_GREEN).append("Description: ")
-					.append(ChatColor.RESET)
-					.append(plugin.getDescription().getDescription())
-					.append("\n");
-			Messenger.tell(sender, Msg.CMD_VERSION, foo.toString());
+		if (first.toLowerCase().matches("version")) {
+			Messenger.tell(sender, Msg.CMD_VERSION, getPluginInfo());
 			return true;
 		}
 
-		String second = (args.length > 1 ? args[1] : "");
-
 		if (first.equals("?") || first.equalsIgnoreCase("help")) {
-			JSLogger.getLogger().info(
-					sender.getName() + " has used command: /joystick help",
-					false);
+			String second = (args.length > 1 ? args[1] : "");
 			if (!second.matches("\\d")) {
 				showHelp(sender);
 				return true;
@@ -150,15 +152,28 @@ public class CommandHandler implements CommandExecutor {
 			return true;
 		}
 
-		if (!command.execute(sender, params)) {
+		if (!execute(command, sender, params)) {
 			showUsage(command, sender, true);
 		}
-
-		JSLogger.getLogger().info(
-				sender.getName() + " has used command: /joystick "
-						+ info.name(), false);
 		return false;
 	}
+
+	/**
+	 * Handles command execution. The reason this is not handled internally in
+	 * {@link #onCommand(CommandSender, org.bukkit.command.Command, String, String[])}
+	 * is because different plugins may wish to attach extra arguments to the
+	 * {@code execute} operation in each Command.
+	 * 
+	 * @param cmd
+	 *            the Command interface, not org.bukkit.command.Command
+	 * @param sender
+	 *            the CommandSender
+	 * @param params
+	 *            the trimmed String[] args
+	 * @return a boolean flag, true if the command was executed, false otherwise
+	 */
+	protected abstract boolean execute(Command cmd, CommandSender sender,
+			String[] params);
 
 	/**
 	 * Trims the first argument, which eventually becomes the command name.
@@ -169,6 +184,30 @@ public class CommandHandler implements CommandExecutor {
 	 */
 	private String[] trimFirstArg(String[] args) {
 		return Arrays.copyOfRange(args, 1, args.length);
+	}
+
+	/**
+	 * Grabs the main plugin information. This is the author, version, and
+	 * description as defined in the plugin.yml file. Override this to remove or
+	 * add extra information. Displayed the a CommandSender when the command
+	 * argument is "version".
+	 * 
+	 * @return a String with author, version, and description info for the
+	 *         {@code plugin}.
+	 */
+	private String getPluginInfo() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("\n");
+		builder.append(ChatColor.DARK_GREEN).append("Author: ")
+				.append(ChatColor.RESET)
+				.append(plugin.getDescription().getAuthors()).append("\n");
+		builder.append(ChatColor.DARK_GREEN).append("Version: ")
+				.append(ChatColor.RESET)
+				.append(plugin.getDescription().getVersion()).append("\n");
+		builder.append(ChatColor.DARK_GREEN).append("Description: ")
+				.append(ChatColor.RESET)
+				.append(plugin.getDescription().getDescription()).append("\n");
+		return builder.toString();
 	}
 
 	/**
@@ -191,11 +230,6 @@ public class CommandHandler implements CommandExecutor {
 
 		if (!PermissionUtils.has(sender, perm.value())) return;
 
-		JSLogger.getLogger().info(
-				sender.getName()
-						+ " has triggered usage for command: /joystick "
-						+ info.name(), false);
-
 		sender.sendMessage((prefix ? "Usage: " : "") + usage.value() + " "
 				+ ChatColor.YELLOW + info.desc());
 	}
@@ -217,12 +251,30 @@ public class CommandHandler implements CommandExecutor {
 				result.add(entry.getValue());
 			}
 		}
-
 		return result;
 	}
 
 	/**
-	 * Show the first page of helpful commands.
+	 * Grabs a set of commands that a given CommandSender has access to. Checks
+	 * against permission values and if the sender has access to each command.
+	 * 
+	 * @param sender
+	 *            the CommandSender to check permissions for
+	 * @return a LinkedHashSet of Commands
+	 */
+	private Set<Command> getAllowedCommands(CommandSender sender) {
+		Set<Command> result = new LinkedHashSet<>();
+		for (Command cmd : commands.values()) {
+			CommandPermission perm = cmd.getClass().getAnnotation(
+					CommandPermission.class);
+			if (PermissionUtils.has(sender, perm.value())) result.add(cmd);
+		}
+		return result;
+	}
+
+	/**
+	 * Shows the first page of commands to a given command sender. This is
+	 * called when no specified page is given by the user asking for help.
 	 * 
 	 * @param sender
 	 *            the CommandSender
@@ -233,8 +285,10 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	/**
-	 * Because there are so many commands, this method shows helpful information
-	 * in a paginated fashion so as not to spam chat.
+	 * Shows 'help', otherwise the usage and info for a command, to a command
+	 * sender. Rather than display all commands at once, which could be
+	 * overwhelming to the user, the help shown is paginated. There are 6
+	 * commands per page and any page can be given.
 	 * 
 	 * @param sender
 	 *            the CommandSender
@@ -242,16 +296,9 @@ public class CommandHandler implements CommandExecutor {
 	 *            an integer representing which commands to show to the player.
 	 */
 	private void showHelp(CommandSender sender, int page) {
-		// Amount of commands
-		int cmds = 0;
-		for (Command cmd : commands.values()) {
-			CommandPermission perm = cmd.getClass().getAnnotation(
-					CommandPermission.class);
+		Set<Command> allowed = getAllowedCommands(sender);
+		int cmds = allowed.size();
 
-			if (PermissionUtils.has(sender, perm.value())) cmds++;
-		}
-
-		// Tell the sender if they asked for a page that was too high.
 		if (Math.ceil(cmds / 6.0) < page) {
 			Messenger.tell(sender,
 					"Given: " + page + "; Expected integer between 1 and "
@@ -260,24 +307,21 @@ public class CommandHandler implements CommandExecutor {
 		}
 
 		StringBuilder builder = new StringBuilder();
-		int number = 0;
+		CommandInfo info;
+		CommandUsage usage;
 
-		for (Command cmd : commands.values()) {
-			number++;
-			CommandInfo info = cmd.getClass().getAnnotation(CommandInfo.class);
-			CommandPermission perm = cmd.getClass().getAnnotation(
-					CommandPermission.class);
-			CommandUsage usage = cmd.getClass().getAnnotation(
-					CommandUsage.class);
-			if (!PermissionUtils.has(sender, perm.value())) continue;
+		int counter = 0;
+		for (Command cmd : allowed) {
+			counter++;
+			info = cmd.getClass().getAnnotation(CommandInfo.class);
+			usage = cmd.getClass().getAnnotation(CommandUsage.class);
 
-			// Make sure we are on the right page.
-			if ((page * 6) - 5 > number) continue;
+			// get to correct page
+			if ((page * 6) - 5 > counter) continue;
 
-			// Break to make sure we don't have too many commands.
-			if (page * 6 < number) break;
+			// break after threshold
+			if (page * 6 < counter) break;
 
-			// Append the command and it's information
 			builder.append("\n").append(ChatColor.RESET).append(usage.value())
 					.append(" ").append(ChatColor.YELLOW).append(info.desc());
 		}
@@ -287,27 +331,27 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	/**
-	 * Registers all commands using {@code #register(Class)}
+	 * Registers all commands using {@link #register(Class)}
 	 */
-	private void registerCommands() {
-		commands = new LinkedHashMap<String, Command>();
-
-		// TODO: Add commands
-	}
+	public abstract void registerCommands();
 
 	/**
 	 * Registers the commands by checking if the class implements Command and
 	 * then appending it based on the command name.
+	 * <p>
+	 * To register a command, just call this method and invoke any class which
+	 * is a child to Command.
+	 * </p>
 	 * 
 	 * @param c
 	 *            a class that implements Command
 	 */
-	private void register(Class<? extends Command> c) {
+	protected void register(Class<? extends Command> c) {
 		CommandInfo info = c.getAnnotation(CommandInfo.class);
 		if (info == null) return;
 
 		try {
-			commands.put(info.pattern(), c.newInstance());
+			commands.put(info.syntax(), c.newInstance());
 		}
 		catch (Exception e) {
 			e.printStackTrace();

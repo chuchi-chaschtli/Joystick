@@ -39,7 +39,7 @@ public @interface CommandInfo {
 	/**
 	 * Regex pattern to allow variation in commands.
 	 */
-	public String pattern();
+	public String syntax();
 
 	/**
 	 * Determines if the command can only be executed by players. If false,
