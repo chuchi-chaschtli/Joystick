@@ -43,7 +43,7 @@ import com.valygard.aohruthless.utils.PermissionUtils;
  * <p>
  * Using the CommandHandler is very simple. It is merely the task of properly
  * registering subcommand classes (by using proper annotation). When a command
- * is processe, the {@code execute} method for the underlying sub command is
+ * is processed, the {@code execute} method for the underlying sub command is
  * called. If something is wrong, such as a misusage or lack of permission, a
  * message is sent to the command user for easy problem resolution.
  * </p>
@@ -81,7 +81,7 @@ public abstract class CommandHandler implements CommandExecutor {
 		String first = (args.length > 0 ? args[0] : "");
 		String last = (args.length > 0 ? args[args.length - 1] : "");
 
-		if (first.toLowerCase().matches("version")) {
+		if (first.equalsIgnoreCase("version")) {
 			Messenger.tell(sender, Msg.CMD_VERSION, getPluginInfo());
 			return true;
 		}
@@ -109,8 +109,7 @@ public abstract class CommandHandler implements CommandExecutor {
 
 		List<Command> matches = getMatchingCommands(first);
 
-		// Because we use regex patterns for the command arguments, we need to
-		// make sure that there are no conflicting matches.
+		// Eliminate duplicate matches by sending error message
 		if (matches.size() > 1) {
 			Messenger.tell(sender, Msg.CMD_MULTIPLE_MATCHES);
 			for (Command command : matches) {
