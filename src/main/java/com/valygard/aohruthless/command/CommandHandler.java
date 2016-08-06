@@ -81,19 +81,14 @@ public abstract class CommandHandler implements CommandExecutor {
 		String first = (args.length > 0 ? args[0] : "");
 		String last = (args.length > 0 ? args[args.length - 1] : "");
 
-		if (first.equalsIgnoreCase("version")) {
+		if (first.matches("(?i)(version|plugin)")) {
 			Messenger.tell(sender, Msg.CMD_VERSION, getPluginInfo());
 			return true;
 		}
 
-		if (first.equals("?") || first.equalsIgnoreCase("help")) {
+		if (first.matches("(?i)(\\?|help)")) {
 			String second = (args.length > 1 ? args[1] : "");
-			if (!second.matches("\\d")) {
-				showHelp(sender);
-				return true;
-			}
-
-			if (second.equals("") || Integer.parseInt(second) <= 1) {
+			if (second.matches("\\D*|-\\d*")) {
 				showHelp(sender);
 				return true;
 			}
@@ -246,7 +241,7 @@ public abstract class CommandHandler implements CommandExecutor {
 	private List<Command> getMatchingCommands(String arg) {
 		List<Command> result = new ArrayList<Command>();
 		for (Entry<String, Command> entry : commands.entrySet()) {
-			if (arg.toLowerCase().matches(entry.getKey())) {
+			if (arg.matches("(?i)" + entry.getKey())) {
 				result.add(entry.getValue());
 			}
 		}
