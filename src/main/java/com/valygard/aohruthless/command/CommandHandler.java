@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -128,7 +129,7 @@ public abstract class CommandHandler implements CommandExecutor {
 			return true;
 		}
 
-		if (last.equals("?") || last.equals("help")) {
+		if (last.matches("(?i)(\\?|help)")) {
 			showUsage(command, sender, false);
 			return true;
 		}
@@ -336,6 +337,11 @@ public abstract class CommandHandler implements CommandExecutor {
 	 * To register a command, just call this method and invoke any class which
 	 * is a child to Command.
 	 * </p>
+	 * <p>
+	 * Certain commands are reserved. No command is allowed to have "version",
+	 * "plugin", "?" or "help" as a command pattern. An IllegalArgumentException
+	 * is thrown if this is violated.
+	 * </p>
 	 * 
 	 * @param c
 	 *            a class that implements Command
@@ -345,6 +351,8 @@ public abstract class CommandHandler implements CommandExecutor {
 		if (info == null) return;
 
 		try {
+			Validate.isTrue(!info.syntax().matches(
+					"(?i)(version|plugin|\\?|help)"));
 			commands.put(info.syntax(), c.newInstance());
 		}
 		catch (Exception e) {
