@@ -60,6 +60,7 @@ import com.valygard.aohruthless.utils.PermissionUtils;
 public abstract class CommandHandler implements CommandExecutor {
 
 	protected Plugin plugin;
+	protected String cmdBase;
 
 	protected Map<String, Command> commands = new LinkedHashMap<>();
 
@@ -69,9 +70,12 @@ public abstract class CommandHandler implements CommandExecutor {
 	 * 
 	 * @param plugin
 	 *            main class instance
+	 * @param cmdBase
+	 *            the name of the command
 	 */
-	public CommandHandler(Plugin plugin) {
+	public CommandHandler(Plugin plugin, String cmdBase) {
 		this.plugin = plugin;
+		this.cmdBase = cmdBase;
 
 		registerCommands();
 	}
@@ -83,7 +87,8 @@ public abstract class CommandHandler implements CommandExecutor {
 		String last = (args.length > 0 ? args[args.length - 1] : "");
 
 		if (first.matches("(?i)(version|plugin)")) {
-			Messenger.tell(sender, Msg.CMD_VERSION, getPluginInfo());
+			Messenger.tell(sender, Msg.CMD_VERSION, "for " + cmdBase + ": "
+					+ getPluginInfo());
 			return true;
 		}
 
@@ -99,7 +104,7 @@ public abstract class CommandHandler implements CommandExecutor {
 		}
 
 		if (last.equals("")) {
-			Messenger.tell(sender, Msg.CMD_HELP);
+			Messenger.tell(sender, Msg.CMD_HELP, cmdBase);
 			return true;
 		}
 
@@ -115,7 +120,7 @@ public abstract class CommandHandler implements CommandExecutor {
 		}
 
 		if (matches.size() == 0) {
-			Messenger.tell(sender, Msg.CMD_NO_MATCHES);
+			Messenger.tell(sender, Msg.CMD_NO_MATCHES, cmdBase);
 			return true;
 		}
 

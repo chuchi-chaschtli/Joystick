@@ -26,16 +26,17 @@ import org.bukkit.configuration.file.YamlConfiguration;
  */
 public enum Msg implements Message {
 	
+	ABILITY_NO_PERM("You do not have permission to use this ability."),
+	
 	ARENA_READY("The arena is ready to be used!"),
 	
-	CMD_HELP("Use &e/joystick help&r to view a list of commands."),
+	CMD_HELP("Use &e/% help&r to view a list of commands."),
 	CMD_MULTIPLE_MATCHES("Did you mean one of these commands?"),
-	CMD_NO_MATCHES("Command not found. Type &e/joystick help&r"),
+	CMD_NO_MATCHES("Command not found. Type &e/% help&r"),
 	CMD_NO_PERMISSION("You do not have access to this command."),
 	CMD_NOT_ENOUGH_ARGS("You did not specify enough arguments."),
 	CMD_NOT_FROM_CONSOLE("Only players may use this command."),
-	CMD_UPDATE_DISABLED("This command has been disabled."),
-	CMD_VERSION("Joystick version information: %");
+	CMD_VERSION("Version information %"), ;
 
 	private String value;
 
