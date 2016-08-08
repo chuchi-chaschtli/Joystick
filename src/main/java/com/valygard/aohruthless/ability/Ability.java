@@ -18,9 +18,7 @@ package com.valygard.aohruthless.ability;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -69,8 +67,18 @@ public abstract class Ability implements Listener {
 		this.perm = perm;
 		this.material = material;
 
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		registerAbility(plugin);
 	}
+
+	/**
+	 * Registers events for this ability given a Plugin instance. All abilities
+	 * are recommended to register events in this method otherwise they will not
+	 * function properly. 
+	 * 
+	 * @param plugin
+	 *            the underlying Plugin instance to register Listener
+	 */
+	protected abstract void registerAbility(Plugin plugin);
 
 	/**
 	 * Grabs ability name
@@ -138,19 +146,4 @@ public abstract class Ability implements Listener {
 	 *            the Player to use the ability
 	 */
 	public abstract void onUse(Player player);
-
-	@EventHandler
-	public void onInteract(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		PlayerInventory inv = player.getInventory();
-		if (inv.getItemInMainHand() == null
-				|| inv.getItemInMainHand().getType() != material) {
-			return;
-		}
-		
-		if (onCheck(player)) {
-			event.setCancelled(true);
-			onUse(player);
-		}
-	}
 }

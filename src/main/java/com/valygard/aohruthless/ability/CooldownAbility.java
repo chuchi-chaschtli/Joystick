@@ -145,7 +145,4 @@ public abstract class CooldownAbility extends Ability {
 		startCooldown(player);
 		return super.onCheck(player);
 	}
-
-	@Override
-	public abstract void onUse(Player player);
 }
