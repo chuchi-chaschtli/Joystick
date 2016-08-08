@@ -26,6 +26,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
  */
 public enum Msg implements Message {
 	
+	ABILITY_COOLDOWN("This ability is on cooldown for % more seconds!"),
 	ABILITY_NO_PERM("You do not have permission to use this ability."),
 	
 	ARENA_READY("The arena is ready to be used!"),
@@ -36,7 +37,7 @@ public enum Msg implements Message {
 	CMD_NO_PERMISSION("You do not have access to this command."),
 	CMD_NOT_ENOUGH_ARGS("You did not specify enough arguments."),
 	CMD_NOT_FROM_CONSOLE("Only players may use this command."),
-	CMD_VERSION("Version information %"), ;
+	CMD_VERSION("Version information %");
 
 	private String value;
 
