@@ -145,4 +145,13 @@ public abstract class CooldownAbility extends Ability {
 		startCooldown(player);
 		return super.onCheck(player);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + cooldown;
+		return result;
+	}
+
 }

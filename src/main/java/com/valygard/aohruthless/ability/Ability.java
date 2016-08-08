@@ -73,7 +73,7 @@ public abstract class Ability implements Listener {
 	/**
 	 * Registers events for this ability given a Plugin instance. All abilities
 	 * are recommended to register events in this method otherwise they will not
-	 * function properly. 
+	 * function properly.
 	 * 
 	 * @param plugin
 	 *            the underlying Plugin instance to register Listener
@@ -146,4 +146,14 @@ public abstract class Ability implements Listener {
 	 *            the Player to use the ability
 	 */
 	public abstract void onUse(Player player);
+
+	@Override
+	public int hashCode() {
+		final int prime = 7;
+		int result = 1;
+		result = prime * result
+				+ ((material == null) ? 0 : material.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
 }
