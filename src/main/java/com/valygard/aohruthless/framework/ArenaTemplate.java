@@ -408,7 +408,7 @@ public abstract class ArenaTemplate implements Arena {
 
 	@Override
 	public int hashCode() {
-		final int prime = 17;
+		final int prime = 31;
 		int result = 1;
 		result = prime * result + arenaName.hashCode();
 		result = prime * result + ((world == null) ? 0 : world.hashCode());
