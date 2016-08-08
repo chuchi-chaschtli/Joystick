@@ -92,7 +92,7 @@ public abstract class CooldownAbility extends Ability {
 	 * @param player
 	 *            the Player to start tracking
 	 */
-	protected void startCooldown(Player player) {
+	private void startCooldown(Player player) {
 		if (!cooldowns.containsKey(player))
 			cooldowns.put(player, System.currentTimeMillis());
 	}
@@ -120,21 +120,9 @@ public abstract class CooldownAbility extends Ability {
 	}
 
 	/**
-	 * Removes a specified {@code player} from the cooldown mapping.
-	 * 
-	 * @param player
-	 *            the Player to remove.
-	 */
-	protected void endCooldown(Player player) {
-		if (cooldowns.containsKey(player)) {
-			cooldowns.remove(player);
-		}
-	}
-
-	/**
 	 * Clears all cooldowns. Used in arena cleanup
 	 */
-	protected void clearCooldowns() {
+	public void clearCooldowns() {
 		cooldowns.clear();
 	}
 
@@ -146,15 +134,16 @@ public abstract class CooldownAbility extends Ability {
 	 * </p>
 	 */
 	@Override
-	public void onCheck(Player player) {
+	public boolean onCheck(Player player) {
 		if (onCooldown(player)) {
 			double diff = cooldown
 					- ((System.currentTimeMillis() - cooldowns.get(player)) / 1000l);
 			Messenger.tell(player, Msg.ABILITY_COOLDOWN,
 					String.format("%.2f", diff));
-			return;
+			return false;
 		}
-		super.onCheck(player);
+		startCooldown(player);
+		return super.onCheck(player);
 	}
 
 	@Override

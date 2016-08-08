@@ -18,7 +18,9 @@ package com.valygard.aohruthless.ability;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -105,17 +107,18 @@ public abstract class Ability implements Listener {
 	 * 
 	 * @param player
 	 *            the Player to check.
+	 * @return true if the item was removed from the player's inventory
 	 */
-	public void onCheck(Player player) {
+	public boolean onCheck(Player player) {
 		if (!player.hasPermission(perm)) {
 			Messenger.tell(player, Msg.ABILITY_NO_PERM);
-			return;
+			return false;
 		}
 		PlayerInventory inv = player.getInventory();
 
 		if (inv.getItemInMainHand() == null
 				|| inv.getItemInMainHand().getType() != material) {
-			return;
+			return false;
 		}
 		int amount = inv.getItemInMainHand().getAmount();
 		if (amount == 1) {
@@ -124,13 +127,30 @@ public abstract class Ability implements Listener {
 			inv.setItemInMainHand(new ItemStack(material, amount - 1));
 		}
 		player.updateInventory();
+		return true;
 	}
 
 	/**
 	 * Handles the usage of the ability. This is unique for each ability and
 	 * determines what the ability actually does.
 	 * 
-	 * @param player the Player to use the ability
+	 * @param player
+	 *            the Player to use the ability
 	 */
 	public abstract void onUse(Player player);
+
+	@EventHandler
+	public void onInteract(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		PlayerInventory inv = player.getInventory();
+		if (inv.getItemInMainHand() == null
+				|| inv.getItemInMainHand().getType() != material) {
+			return;
+		}
+		
+		if (onCheck(player)) {
+			event.setCancelled(true);
+			onUse(player);
+		}
+	}
 }
