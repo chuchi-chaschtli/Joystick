@@ -124,7 +124,7 @@ public class InventoryUtils {
 					inv.remove(item);
 					amount -= newAmount;
 					if (amount == 0) {
-						break;
+						return true;
 					}
 				}
 			}
