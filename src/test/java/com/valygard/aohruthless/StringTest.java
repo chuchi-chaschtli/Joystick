@@ -26,7 +26,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.valygard.aohruthless.util.MockUtils;
+import com.valygard.aohruthless.mock.MockUtils;
 import com.valygard.aohruthless.utils.StringUtils;
 
 /**

@@ -24,15 +24,14 @@ import org.junit.Test;
 
 import com.valygard.aohruthless.framework.spawn.Spawn;
 import com.valygard.aohruthless.framework.spawn.Spawnpoint;
-import com.valygard.aohruthless.util.MockWorld;
-
+import com.valygard.aohruthless.mock.MockWorld;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class SpawnpointTest {
-	
+
 	private static final int X = 32;
 	private static final int Y = 64;
 	private static final int Z = -100;
@@ -40,11 +39,11 @@ public class SpawnpointTest {
 	@Test
 	public void testSpawnpoint() {
 		World mockWorld = new MockWorld("Hello World!");
-		Spawnpoint spawn = new Spawnpoint(Spawn.DEFAULT, new Location(mockWorld, X, Y, Z));
-		
+		Spawnpoint spawn = new Spawnpoint(Spawn.DEFAULT, new Location(
+				mockWorld, X, Y, Z));
+
 		Assert.assertTrue(spawn.toVector().equals(new Vector(X, Y, Z)));
 		Assert.assertTrue(spawn.getSpawnType() == Spawn.DEFAULT);
-		Assert.assertTrue(spawn.getWorld() == mockWorld);
+		Assert.assertTrue(spawn.getWorld().equals(mockWorld));
 	}
-	
 }

@@ -14,7 +14,7 @@
  * You can view a copy of the GNU General Public License at 
  * <http://www.gnu.org/licenses/> if you have not received a copy.
  */
-package com.valygard.aohruthless.util;
+package com.valygard.aohruthless.mock;
 
 import java.io.File;
 import java.util.Collection;
