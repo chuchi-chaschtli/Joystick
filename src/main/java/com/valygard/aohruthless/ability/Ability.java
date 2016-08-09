@@ -20,11 +20,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.messenger.Messenger;
 import com.valygard.aohruthless.messenger.Msg;
+import com.valygard.aohruthless.utils.inventory.InventoryUtils;
 
 /**
  * Basic Ability container. All abilities are unique in {@code name} and
@@ -122,19 +122,7 @@ public abstract class Ability implements Listener {
 			Messenger.tell(player, Msg.ABILITY_NO_PERM);
 			return false;
 		}
-		PlayerInventory inv = player.getInventory();
-
-		if (inv.getItemInMainHand() == null
-				|| inv.getItemInMainHand().getType() != material) {
-			return false;
-		}
-		int amount = inv.getItemInMainHand().getAmount();
-		if (amount == 1) {
-			inv.setItemInMainHand(null);
-		} else {
-			inv.setItemInMainHand(new ItemStack(material, amount - 1));
-		}
-		player.updateInventory();
+		InventoryUtils.removeItems(player, new ItemStack(material), 1);
 		return true;
 	}
 

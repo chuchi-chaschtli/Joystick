@@ -89,6 +89,50 @@ public class InventoryUtils {
 	}
 
 	/**
+	 * Comprehensively removes items from a {@code player}'s inventory. Given a
+	 * an ItemStack comparison and an amount, we iterate through the player's
+	 * inventory contents to see if the itemstack matches in type, item meta,
+	 * and durability. We remove by the amount specified. If the Player does not
+	 * have the amount of items specified to remove, all their items that match
+	 * the {@code stack} are removed.
+	 * 
+	 * @param player
+	 *            the Player to remove items from
+	 * @param stack
+	 *            the ItemStack to remove
+	 * @param amount
+	 *            the amount to remove
+	 * @return true if and only if the {@code amount} of items was removed,
+	 *         false otherwise
+	 */
+	public static boolean removeItems(Player player, ItemStack stack, int amount) {
+		if (stack == null || stack.getType() == Material.AIR) {
+			return false;
+		}
+
+		PlayerInventory inv = player.getInventory();
+		for (ItemStack item : inv.getContents()) {
+			if (item == null) continue;
+			if (item.getType() == stack.getType()
+					&& item.getDurability() == stack.getDurability()
+					&& item.getItemMeta().equals(stack.getItemMeta())) {
+				int newAmount = item.getAmount() - amount;
+				if (newAmount > 0) {
+					item.setAmount(newAmount);
+					return true;
+				} else {
+					inv.remove(item);
+					amount -= newAmount;
+					if (amount == 0) {
+						break;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Checks if the ItemStack appears to be a weapon type. If true, when a
 	 * weapon is given to a player, its durability will be set to the absolute
 	 * maximum. Using this method ensures no false positives because of the
