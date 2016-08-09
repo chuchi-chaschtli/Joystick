@@ -25,7 +25,6 @@
 package com.valygard.aohruthless;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -33,12 +32,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-
 /**
  * @author Anand
- *
+ * 
  */
 public class ArenaClass {
+
 	private String name, lowercaseName;
 
 	private ItemStack helmet, chestplate, leggings, boots;
@@ -46,6 +45,19 @@ public class ArenaClass {
 
 	private boolean unbreakableWeapons, unbreakableArmor;
 
+	/**
+	 * Singular constructor initializes a unique ArenaClass instance by three
+	 * parameters; a unique string identifer which will serve as the name of the
+	 * ArenaClass, and two flags to determine whether or not weapon and armor
+	 * are unbreakable.
+	 * 
+	 * @param name
+	 *            the String name; must be unique
+	 * @param unbreakableWeapons
+	 *            boolean flag, if true, weapons are unbreakable
+	 * @param unbreakableArmor
+	 *            boolean flag, if true, armor is unbreakable
+	 */
 	public ArenaClass(String name, boolean unbreakableWeapons,
 			boolean unbreakableArmor) {
 		this.name = name;
@@ -65,6 +77,7 @@ public class ArenaClass {
 	 * etc.. manually.
 	 * 
 	 * @param p
+	 *            a Player
 	 */
 	public void giveItems(Player p) {
 		PlayerInventory inv = p.getInventory();
@@ -72,13 +85,12 @@ public class ArenaClass {
 		for (ItemStack is : items) {
 			p.getInventory().addItem(is);
 		}
-		
+
 		if (!armor.isEmpty()) {
 			for (ItemStack is : armor) {
 				ArmorType type = ArmorType.getType(is);
-				
-				if (type == null)
-					continue;
+
+				if (type == null) continue;
 
 				switch (type) {
 				case HELMET:
@@ -98,38 +110,38 @@ public class ArenaClass {
 				}
 			}
 		}
-		
-		if (helmet != null) 
-			inv.setHelmet(helmet);
-		
-        if (chestplate != null) 
-        	inv.setChestplate(chestplate);
-        
-        if (leggings != null) 
-        	inv.setLeggings(leggings);
-        
-        if (boots != null) 
-        	inv.setBoots(boots);
+
+		if (helmet != null) inv.setHelmet(helmet);
+
+		if (chestplate != null) inv.setChestplate(chestplate);
+
+		if (leggings != null) inv.setLeggings(leggings);
+
+		if (boots != null) inv.setBoots(boots);
 	}
-	
-    /**
-     * Add an item to the items list.
-     * @param stack an item
-     */
-    public void addItem(ItemStack stack) {
-        if (stack == null) return;
-        
-        if (stack.getAmount() > 64) {
-            while (stack.getAmount() > 64) {
-                items.add(new ItemStack(stack.getType(), 64));
-                stack.setAmount(stack.getAmount() - 64);
-            }
-        }
-        items.add(stack);
-    }
 
 	/**
-	 * Get the configuration name.
+	 * Adds an itemstack to the items list.
+	 * 
+	 * @param stack
+	 *            an ItemStack
+	 */
+	public void addItem(ItemStack stack) {
+		if (stack == null) return;
+
+		int stackSize = stack.getMaxStackSize() < 0 ? 64 : stack
+				.getMaxStackSize();
+		if (stack.getAmount() > stackSize) {
+			while (stack.getAmount() > stackSize) {
+				items.add(new ItemStack(stack.getType(), stackSize));
+				stack.setAmount(stack.getAmount() - stackSize);
+			}
+		}
+		items.add(stack);
+	}
+
+	/**
+	 * Gets the configuration name.
 	 * 
 	 * @return the class
 	 */
@@ -138,7 +150,7 @@ public class ArenaClass {
 	}
 
 	/**
-	 * Get the name of the class to lowercase for easier use later.
+	 * Gets the name of the class to lowercase for easier use later.
 	 * 
 	 * @return the class to lowercase
 	 */
@@ -147,7 +159,7 @@ public class ArenaClass {
 	}
 
 	/**
-	 * Get the inventory contents.
+	 * Gets the inventory contents.
 	 * 
 	 * @return the items list
 	 */
@@ -156,7 +168,7 @@ public class ArenaClass {
 	}
 
 	/**
-	 * Get the class's armor contents.
+	 * Gets the class's armor contents.
 	 * 
 	 * @return the armor list
 	 */
@@ -165,7 +177,7 @@ public class ArenaClass {
 	}
 
 	/**
-	 * Check if the weapons are unbreakable.
+	 * Checks if the weapons are designated unbreakable.
 	 * 
 	 * @return if the weapons are unbreakable
 	 */
@@ -174,18 +186,17 @@ public class ArenaClass {
 	}
 
 	/**
-	 * Change the boolean value.
+	 * Sets whether or not the weapons are to be unbreakable.
 	 * 
 	 * @param unbreakable
-	 * @return unbreakable
+	 *            a boolean flag which may change the unbreakable weapon state.
 	 */
-	public boolean setUnbreakableWeapons(boolean unbreakable) {
+	public void setUnbreakableWeapons(boolean unbreakable) {
 		this.unbreakableWeapons = unbreakable;
-		return unbreakableWeapons;
 	}
 
 	/**
-	 * Check if armor is unbreakable.
+	 * Checks if armor is to be unbreakable.
 	 * 
 	 * @return true if the armor is unbreakable
 	 */
@@ -194,138 +205,116 @@ public class ArenaClass {
 	}
 
 	/**
-	 * Change the boolean value.
+	 * Sets whether or not armor is to be unbreakable.
 	 * 
 	 * @param unbreakable
-	 * @return unbreakable
+	 *            a boolean flag which may change the unbreakable armor state.
 	 */
-	public boolean setUnbreakableArmor(boolean unbreakable) {
+	public void setUnbreakableArmor(boolean unbreakable) {
 		this.unbreakableArmor = unbreakable;
-		return unbreakableArmor;
 	}
-	
-    /**
-     * Set the helmet slot for the class.
-     * @param helmet an item
-     */
-    public void setHelmet(ItemStack helmet) {
-        this.helmet = helmet;
-    }
-    
-    /**
-     * Set the chestplate slot for the class.
-     * @param chestplate an item
-     */
-    public void setChestplate(ItemStack chestplate) {
-        this.chestplate = chestplate;
-    }
-    
-    /**
-     * Set the leggings slot for the class.
-     * @param leggings an item
-     */
-    public void setLeggings(ItemStack leggings) {
-        this.leggings = leggings;
-    }
-    
-    /**
-     * Set the boots slot for the class.
-     * @param boots an item
-     */
-    public void setBoots(ItemStack boots) {
-        this.boots = boots;
-    }
-    
-    /**
-     * Replace the current armor list with the given list.
-     * @param armor a list of items
-     */
-    public void setArmor(List<ItemStack> armor) {
-        this.armor = armor;
-    }
-    
-    /**
-     * Replace the current items list with a new list of all the items in the given list.
-     * This method uses the addItem() method for each item to ensure consistency.
-     * @param stacks a list of items
-     */
-    public void setItems(List<ItemStack> stacks) {
-        this.items = new ArrayList<ItemStack>(stacks.size());
-        for (ItemStack stack : stacks) {
-            addItem(stack);
-        }
-    }
-    
-    
+
 	/**
-	 * Used by isWeapon() to determine if an ItemStack is a weapon type.
+	 * Sets the helmet slot for the class.
+	 * 
+	 * @param helmet
+	 *            an item
 	 */
-	private static Material[] weaponTypes = { Material.BOW,
-			Material.FLINT_AND_STEEL, Material.IRON_AXE, Material.IRON_HOE,
-			Material.IRON_PICKAXE, Material.IRON_SPADE, Material.IRON_SWORD,
-			Material.GOLD_AXE, Material.GOLD_HOE, Material.GOLD_PICKAXE,
-			Material.GOLD_SPADE, Material.GOLD_SWORD, Material.STONE_AXE,
-			Material.STONE_HOE, Material.STONE_PICKAXE, Material.STONE_SPADE,
-			Material.STONE_SWORD, Material.WOOD_AXE, Material.WOOD_HOE,
-			Material.WOOD_PICKAXE, Material.WOOD_SPADE, Material.WOOD_SWORD,
-			Material.DIAMOND_AXE, Material.DIAMOND_HOE,
-			Material.DIAMOND_PICKAXE, Material.DIAMOND_SPADE,
-			Material.DIAMOND_SWORD, Material.FISHING_ROD, Material.CARROT_STICK };
-
-    /**
-     * Returns true, if the ItemStack appears to be a weapon, in which case
-     * the addItem() method will set the weapon durability to the absolute
-     * maximum, as to give them "infinite" durability.
-     * @param stack an ItemStack
-     * @return true, if the item is a weapon
-     */
-    public static boolean isWeapon(ItemStack stack) {
-        if (stack == null)
-        	return false;
-        return Arrays.binarySearch(weaponTypes, stack.getType()) > -1;
-    }
-    
-    /**
-     * Used by the giveItems() method to determine the armor type of a given
-     * ItemStack. Armor pieces are auto-equipped.
-     * This enum is made for backwards-compatibility of armor node.
-     */
-    public enum ArmorType {
-		HELMET(Material.LEATHER_HELMET, Material.CHAINMAIL_HELMET,
-				Material.IRON_HELMET, Material.GOLD_HELMET, Material.DIAMOND_HELMET), 
-		CHESTPLATE(Material.LEATHER_CHESTPLATE, Material.CHAINMAIL_CHESTPLATE,
-				Material.IRON_CHESTPLATE, Material.GOLD_CHESTPLATE, Material.DIAMOND_CHESTPLATE), 
-		LEGGINGS(Material.LEATHER_LEGGINGS, Material.CHAINMAIL_LEGGINGS, 
-				Material.IRON_LEGGINGS, Material.GOLD_LEGGINGS, Material.DIAMOND_LEGGINGS), 
-		BOOTS(Material.LEATHER_BOOTS, Material.CHAINMAIL_BOOTS, 
-				Material.IRON_BOOTS, Material.GOLD_BOOTS, Material.DIAMOND_BOOTS);
-        
-        private Material[] types;
-        
-        private ArmorType(Material... types) {
-            this.types = types;
-        }
-        
-        public static ArmorType getType(ItemStack stack) {
-           Material m = stack.getType();
-            
-            for (ArmorType armorType : ArmorType.values()) {
-                for (Material type : armorType.types) {
-                    if (m == type) {
-                        return armorType;
-                    }
-                }
-            }
-            return null;
-        }
-    }
+	public void setHelmet(ItemStack helmet) {
+		this.helmet = helmet;
+	}
 
 	/**
-	 * Checs whether or not an item is a helmet. This is useful for
+	 * Sets the chestplate slot for the class.
+	 * 
+	 * @param chestplate
+	 *            an item
+	 */
+	public void setChestplate(ItemStack chestplate) {
+		this.chestplate = chestplate;
+	}
+
+	/**
+	 * Sets the leggings slot for the class.
+	 * 
+	 * @param leggings
+	 *            an item
+	 */
+	public void setLeggings(ItemStack leggings) {
+		this.leggings = leggings;
+	}
+
+	/**
+	 * Sets the boots slot for the class.
+	 * 
+	 * @param boots
+	 *            an item
+	 */
+	public void setBoots(ItemStack boots) {
+		this.boots = boots;
+	}
+
+	/**
+	 * Replaces the current armor list with the given list.
+	 * 
+	 * @param armor
+	 *            a list of items
+	 */
+	public void setArmor(List<ItemStack> armor) {
+		this.armor = armor;
+	}
+
+	/**
+	 * Replaces the current items list with a new list of all the items in the
+	 * given list. This method uses the addItem() method for each item to ensure
+	 * consistency.
+	 * 
+	 * @param stacks
+	 *            a list of items
+	 */
+	public void setItems(List<ItemStack> stacks) {
+		this.items = new ArrayList<ItemStack>(stacks.size());
+		for (ItemStack stack : stacks) {
+			addItem(stack);
+		}
+	}
+
+	/**
+	 * Convenience enum to detemine if an itemstack is an armor type.
+	 */
+	public enum ArmorType {
+		HELMET(Material.LEATHER_HELMET, Material.CHAINMAIL_HELMET, Material.IRON_HELMET, Material.GOLD_HELMET, Material.DIAMOND_HELMET),
+		CHESTPLATE(Material.LEATHER_CHESTPLATE, Material.CHAINMAIL_CHESTPLATE, Material.IRON_CHESTPLATE, Material.GOLD_CHESTPLATE, Material.DIAMOND_CHESTPLATE),
+		LEGGINGS(Material.LEATHER_LEGGINGS, Material.CHAINMAIL_LEGGINGS, Material.IRON_LEGGINGS, Material.GOLD_LEGGINGS, Material.DIAMOND_LEGGINGS),
+		BOOTS(Material.LEATHER_BOOTS, Material.CHAINMAIL_BOOTS, Material.IRON_BOOTS, Material.GOLD_BOOTS, Material.DIAMOND_BOOTS);
+
+		private Material[] types;
+
+		private ArmorType(Material... types) {
+			this.types = types;
+		}
+
+		public static ArmorType getType(ItemStack stack) {
+			Material m = stack.getType();
+
+			for (ArmorType armorType : ArmorType.values()) {
+				for (Material type : armorType.types) {
+					if (m == type) {
+						return armorType;
+					}
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * Checks whether or not an item is a helmet. This is useful for
 	 * non-conventional helmet types such as wool or skulls, which can have
 	 * durability but are not like normal helmets that 'wear out'.
 	 * 
-	 * @param stack an itemstack to check
+	 * @param stack
+	 *            an itemstack to check
 	 * @return true if the stack is a helmet.
 	 */
 	public static boolean isHelmet(ItemStack stack) {

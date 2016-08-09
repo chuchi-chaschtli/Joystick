@@ -16,6 +16,8 @@
  */
 package com.valygard.aohruthless.utils.inventory;
 
+import java.util.Arrays;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -84,5 +86,34 @@ public class InventoryUtils {
 			}
 		}
 		p.updateInventory();
+	}
+
+	/**
+	 * Checks if the ItemStack appears to be a weapon type. If true, when a
+	 * weapon is given to a player, its durability will be set to the absolute
+	 * maximum. Using this method ensures no false positives because of the
+	 * unchanging array, but there can be false negatives.
+	 * 
+	 * @param stack
+	 *            the ItemStack
+	 * @return true if the ItemStack given is a weapon
+	 */
+	public static boolean isWeapon(ItemStack stack) {
+		if (stack == null) return false;
+
+		Material[] weaponTypes = { Material.BOW, Material.FLINT_AND_STEEL,
+				Material.IRON_AXE, Material.IRON_HOE, Material.IRON_PICKAXE,
+				Material.IRON_SPADE, Material.IRON_SWORD, Material.GOLD_AXE,
+				Material.GOLD_HOE, Material.GOLD_PICKAXE, Material.GOLD_SPADE,
+				Material.GOLD_SWORD, Material.STONE_AXE, Material.STONE_HOE,
+				Material.STONE_PICKAXE, Material.STONE_SPADE,
+				Material.STONE_SWORD, Material.WOOD_AXE, Material.WOOD_HOE,
+				Material.WOOD_PICKAXE, Material.WOOD_SPADE,
+				Material.WOOD_SWORD, Material.DIAMOND_AXE,
+				Material.DIAMOND_HOE, Material.DIAMOND_PICKAXE,
+				Material.DIAMOND_SPADE, Material.DIAMOND_SWORD,
+				Material.FISHING_ROD, Material.CARROT_STICK };
+
+		return Arrays.binarySearch(weaponTypes, stack.getType()) > -1;
 	}
 }
