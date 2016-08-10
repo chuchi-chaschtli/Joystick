@@ -91,10 +91,10 @@ public class InventoryUtils {
 	/**
 	 * Comprehensively removes items from a {@code player}'s inventory. Given a
 	 * an ItemStack comparison and an amount, we iterate through the player's
-	 * inventory contents to see if the itemstack matches in type, item meta,
-	 * and durability. We remove by the amount specified. If the Player does not
-	 * have the amount of items specified to remove, all their items that match
-	 * the {@code stack} are removed.
+	 * inventory contents to see if the itemstacks are similar (equal ignoring
+	 * amount). We remove by the amount specified. If the Player does not have
+	 * the amount of items specified to remove, all their items that match the
+	 * {@code stack} are removed.
 	 * 
 	 * @param player
 	 *            the Player to remove items from
@@ -113,9 +113,7 @@ public class InventoryUtils {
 		PlayerInventory inv = player.getInventory();
 		for (ItemStack item : inv.getContents()) {
 			if (item == null) continue;
-			if (item.getType() == stack.getType()
-					&& item.getDurability() == stack.getDurability()
-					&& item.getItemMeta().equals(stack.getItemMeta())) {
+			if (item.isSimilar(stack)) {
 				int newAmount = item.getAmount() - amount;
 				if (newAmount > 0) {
 					item.setAmount(newAmount);
