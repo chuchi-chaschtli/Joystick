@@ -34,7 +34,6 @@ import com.valygard.aohruthless.ArenaClass;
 import com.valygard.aohruthless.RatingSystem;
 import com.valygard.aohruthless.framework.spawn.Spawn;
 import com.valygard.aohruthless.framework.spawn.Spawnpoint;
-import com.valygard.aohruthless.messenger.JSLogger;
 import com.valygard.aohruthless.messenger.Messenger;
 import com.valygard.aohruthless.player.PlayerData;
 import com.valygard.aohruthless.player.PlayerStats;
@@ -282,7 +281,7 @@ public abstract class ArenaTemplate implements Arena {
 			return stat;
 		}
 		catch (IOException e) {
-			JSLogger.getLogger().warn(
+			plugin.getLogger().warning(
 					"Could not get the stats of player '" + p.getName() + "'!");
 			e.printStackTrace();
 			return null;

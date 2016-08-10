@@ -21,22 +21,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
-import com.valygard.aohruthless.messenger.JSLogger;
 import com.valygard.aohruthless.utils.StringUtils;
-
 
 /**
  * @author Anand
- *
+ * 
  */
 public class ItemParser {
-	
+
 	/**
 	 * Prevent initialization of utility class.
 	 * 
@@ -46,7 +45,7 @@ public class ItemParser {
 	private ItemParser() {
 		throw new AssertionError("Cannot initialize utility constructor");
 	}
-	
+
 	/**
 	 * Returns a string representation of a given itemstack collection. Iterates
 	 * through the itemstacks and parses individually using
@@ -61,8 +60,7 @@ public class ItemParser {
 
 		// Parse each stack
 		for (ItemStack stack : stacks) {
-			if (stack == null || stack.getType() == Material.AIR)
-				continue;
+			if (stack == null || stack.getType() == Material.AIR) continue;
 
 			result += ", " + parseString(stack);
 		}
@@ -83,8 +81,7 @@ public class ItemParser {
 	 * @return
 	 */
 	public static String parseString(ItemStack stack) {
-		if (stack.getType() == Material.AIR)
-			return null;
+		if (stack.getType() == Material.AIR) return null;
 
 		// <item> part
 		String type = stack.getType().toString().toLowerCase();
@@ -207,8 +204,7 @@ public class ItemParser {
 	 * @return an ItemStack.
 	 */
 	public static ItemStack parseItem(String item) {
-		if (item == null || item.equals(""))
-			return null;
+		if (item == null || item.equals("")) return null;
 
 		// Check if the item has enchantments.
 		String[] space = item.split(" ");
@@ -229,7 +225,7 @@ public class ItemParser {
 			break;
 		}
 		if (result == null || result.getType() == Material.AIR) {
-			JSLogger.getLogger().warn("Failed to parse item: " + item);
+			Bukkit.getLogger().warning("Failed to parse item: " + item);
 			return null;
 		}
 
@@ -248,7 +244,7 @@ public class ItemParser {
 	 */
 	@SuppressWarnings("deprecation")
 	private static ItemStack singleItem(String item) {
-		if (item.matches("\\$(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
+		if (item.matches("\\$(([1-9]\\d*)|(\\d*.\\d{2}))")) {
 			double amount = Double.parseDouble(item.substring(1));
 
 			int major = (int) amount;
@@ -302,7 +298,7 @@ public class ItemParser {
 	 */
 	private static Material getType(String item) {
 		if (!item.matches("[\\w[^d]]*")) {
-			JSLogger.getLogger().warn("Material Type must be a string!");
+			Bukkit.getLogger().warning("Material Type must be a string!");
 			return null;
 		}
 

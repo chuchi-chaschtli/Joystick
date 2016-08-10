@@ -35,7 +35,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.ArenaClass;
 import com.valygard.aohruthless.ArenaClass.ArmorType;
-import com.valygard.aohruthless.messenger.JSLogger;
 import com.valygard.aohruthless.messenger.Messenger;
 import com.valygard.aohruthless.messenger.Msg;
 import com.valygard.aohruthless.utils.PermissionUtils;
@@ -188,14 +187,14 @@ public abstract class ArenaManager {
 		if (!worldName.equals("")) {
 			world = plugin.getServer().getWorld(worldName);
 			if (world == null) {
-				JSLogger.getLogger().warn(
+				plugin.getLogger().warning(
 						"World '" + worldName + "' for arena '" + arenaName
 								+ "' was not found...");
 				return null;
 			}
 		} else {
 			world = plugin.getServer().getWorlds().get(0);
-			JSLogger.getLogger().warn(
+			plugin.getLogger().warning(
 					"Could not find the world for arena '" + arenaName
 							+ "'. Using default world ('" + world.getName()
 							+ "')! Check the config-file!");
@@ -207,7 +206,7 @@ public abstract class ArenaManager {
 		Arena arena = initArena(arenaName);
 
 		arenas.add(arena);
-		JSLogger.getLogger().info(
+		plugin.getLogger().info(
 				"Loaded arena '" + arenaName + "' in world '" + worldName
 						+ "'.");
 		return arena;
@@ -271,7 +270,7 @@ public abstract class ArenaManager {
 		config.set("arenas." + name, null);
 		plugin.saveConfig();
 
-		JSLogger.getLogger().info("The arena '" + name + "' has been removed.");
+		plugin.getLogger().info("The arena '" + name + "' has been removed.");
 	}
 
 	/**
@@ -352,7 +351,7 @@ public abstract class ArenaManager {
 
 		// If the section doesn't exist, the class doesn't either.
 		if (section == null) {
-			JSLogger.getLogger().warn(
+			plugin.getLogger().warning(
 					"Failed to load class '" + classname + "'.");
 			return null;
 		}

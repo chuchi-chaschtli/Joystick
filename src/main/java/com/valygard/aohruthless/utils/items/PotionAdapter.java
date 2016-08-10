@@ -20,11 +20,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-
-import com.valygard.aohruthless.messenger.JSLogger;
-
 
 /**
  * Matches all creative inventory potions to their attributes. Each potion is
@@ -170,11 +168,10 @@ public enum PotionAdapter {
 		for (PotionAdapter pm : PotionAdapter.values()) {
 			if (pm.getType() == data.getType()
 					&& pm.isExtended() == data.isExtended()
-					&& pm.isUpgraded() == data.isUpgraded())
-				return pm;
+					&& pm.isUpgraded() == data.isUpgraded()) return pm;
 		}
 		// error here would mean there is missing PotionData values
-		JSLogger.getLogger().error("Invalid Potion value ... ");
+		Bukkit.getLogger().config("Invalid Potion value ... ");
 		return WATER;
 	}
 
@@ -190,10 +187,9 @@ public enum PotionAdapter {
 	public static PotionAdapter matchHandle(String handle) {
 		for (PotionAdapter pm : PotionAdapter.values()) {
 			if (pm.getIdentifiers().contains(
-					handle.toLowerCase().replace("_", "-")))
-				return pm;
+					handle.toLowerCase().replace("_", "-"))) return pm;
 		}
-		JSLogger.getLogger().warn(
+		Bukkit.getLogger().warning(
 				handle + " could not be parsed as a potion!"
 						+ " Water Bottle created ...");
 		return WATER;

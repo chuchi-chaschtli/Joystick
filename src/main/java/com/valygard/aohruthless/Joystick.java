@@ -26,10 +26,16 @@ package com.valygard.aohruthless;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
+import java.util.logging.FileHandler;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 import net.milkbowl.vault.economy.Economy;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,8 +43,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.valygard.aohruthless.messenger.JSLogger;
 
 /**
  * @author Anand
@@ -64,7 +68,7 @@ public class Joystick extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		JSLogger.setLogger(this);
+		setupLogger();
 
 		loadVault();
 
@@ -72,6 +76,37 @@ public class Joystick extends JavaPlugin {
 
 		reloadConfig();
 		saveConfig();
+	}
+
+	private void setupLogger() {
+		File dir = new File(getDataFolder() + File.separator + "logs");
+		dir.mkdirs();
+		try {
+			FileHandler handler = new FileHandler(dir + File.separator
+					+ "joystick.log");
+			getLogger().addHandler(handler);
+			handler.setFormatter(new SimpleFormatter() {
+
+				@Override
+				public String format(LogRecord record) {
+					Date date = new Date();
+					SimpleDateFormat df = new SimpleDateFormat(
+							"[MM-dd-yyyy HH:mm:ss]");
+					return df.format(date)
+							+ " "
+							+ record.getLevel()
+							+ ":"
+							// org.apache.commons.lang
+							+ StringUtils.replace(record.getMessage(),
+									"[Joystick]", "")
+							+ System.getProperty("line.separator");
+				}
+			});
+		}
+		catch (SecurityException | IOException e) {
+			e.printStackTrace();
+			return;
+		}
 	}
 
 	private void init() {
@@ -84,7 +119,7 @@ public class Joystick extends JavaPlugin {
 	private void loadVault() {
 		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
 		if (vault == null) {
-			JSLogger.getLogger().warn(
+			getLogger().warning(
 					"Economy rewards cannot function without vault.");
 			return;
 		}
@@ -95,12 +130,13 @@ public class Joystick extends JavaPlugin {
 
 		if (e != null) {
 			econ = e.getProvider();
-			JSLogger.getLogger().info(
+			getLogger().info(
 					"Vault v" + vault.getDescription().getVersion()
 							+ " has been found! Economy rewards enabled.");
 		} else {
-			JSLogger.getLogger()
-					.warn("Vault found, but no economy plugin detected ... Economy rewards will not function!");
+			getLogger()
+					.warning(
+							"Vault found, but no economy plugin detected ... Economy rewards will not function!");
 		}
 	}
 

@@ -16,19 +16,17 @@
  */
 package com.valygard.aohruthless.utils.items;
 
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 
-import com.valygard.aohruthless.messenger.JSLogger;
-
-
 /**
  * @author Anand
- *
+ * 
  */
 public class PotionUtils {
-	
+
 	/**
 	 * Prevent initialization of utility class.
 	 * 
@@ -38,7 +36,7 @@ public class PotionUtils {
 	private PotionUtils() {
 		throw new AssertionError("Cannot initialize utility constructor");
 	}
-	
+
 	/**
 	 * Checks if a material is a potion through its name.
 	 * 
@@ -71,7 +69,7 @@ public class PotionUtils {
 	public static String getHandle(ItemStack stack) {
 		// should never be executed, precautionary
 		if (!isPotion(stack)) {
-			JSLogger.getLogger().error(
+			Bukkit.getLogger().severe(
 					"Attempt to parse an itemstack as a potion failed");
 			return null;
 		}
@@ -94,7 +92,7 @@ public class PotionUtils {
 	 */
 	public static ItemStack createPotion(ItemStack stack, String handle) {
 		if (!isPotion(stack)) {
-			JSLogger.getLogger().error(
+			Bukkit.getLogger().severe(
 					"Attempt to parse the following itemstack failed: "
 							+ handle);
 			return null;

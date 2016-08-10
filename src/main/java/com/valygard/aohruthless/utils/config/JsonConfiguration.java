@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -32,7 +33,6 @@ import org.json.simple.parser.ParseException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.valygard.aohruthless.messenger.JSLogger;
 
 /**
  * Utility for Json file creation. Allows for simple reading/writing of Json
@@ -88,7 +88,7 @@ public class JsonConfiguration {
 			}
 		}
 		catch (IOException | ParseException e) {
-			JSLogger.getLogger().error(
+			Bukkit.getLogger().severe(
 					"Could not parse JSON file '" + fileName + "'!");
 			this.obj = new JSONObject();
 		}
@@ -106,7 +106,7 @@ public class JsonConfiguration {
 				this.reader = new FileReader(file);
 			}
 			catch (FileNotFoundException e) {
-				JSLogger.getLogger().error(
+				Bukkit.getLogger().severe(
 						"Could not read JSON file '" + fileName + "'!");
 				e.printStackTrace();
 			}
@@ -230,7 +230,7 @@ public class JsonConfiguration {
 			writer.write(gson.toJson(parser.parse(obj.toJSONString())));
 		}
 		catch (IOException | ParseException e) {
-			JSLogger.getLogger().error(
+			Bukkit.getLogger().severe(
 					"Could not write to JSON file '" + fileName + "'!");
 			e.printStackTrace();
 		}
