@@ -122,8 +122,7 @@ public abstract class Ability implements Listener {
 			Messenger.tell(player, Msg.ABILITY_NO_PERM);
 			return false;
 		}
-		InventoryUtils.removeItems(player, new ItemStack(material), 1);
-		return true;
+		return InventoryUtils.removeItems(player, new ItemStack(material), 1) == 1;
 	}
 
 	/**

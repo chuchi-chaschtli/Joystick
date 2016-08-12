@@ -102,32 +102,36 @@ public class InventoryUtils {
 	 *            the ItemStack to remove
 	 * @param amount
 	 *            the amount to remove
-	 * @return true if and only if the {@code amount} of items was removed,
-	 *         false otherwise
+	 * @return the amount of items removed from the player's inventory. If this
+	 *         matches the given {@code amount}, then the removal was
+	 *         successful. If this value is -1, then the given itemstack was
+	 *         null or air
 	 */
-	public static boolean removeItems(Player player, ItemStack stack, int amount) {
+	public static int removeItems(Player player, ItemStack stack, int amount) {
 		if (stack == null || stack.getType() == Material.AIR) {
-			return false;
+			return -1;
 		}
 
 		PlayerInventory inv = player.getInventory();
+		int tmp = amount;
+
 		for (ItemStack item : inv.getContents()) {
 			if (item == null) continue;
 			if (item.isSimilar(stack)) {
-				int newAmount = item.getAmount() - amount;
+				int newAmount = item.getAmount() - tmp;
 				if (newAmount > 0) {
 					item.setAmount(newAmount);
-					return true;
+					return amount;
 				} else {
 					inv.remove(item);
-					amount -= newAmount;
-					if (amount == 0) {
-						return true;
+					tmp -= newAmount;
+					if (tmp == 0) {
+						return amount;
 					}
 				}
 			}
 		}
-		return false;
+		return tmp;
 	}
 
 	/**
