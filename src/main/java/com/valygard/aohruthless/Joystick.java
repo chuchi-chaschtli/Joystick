@@ -58,6 +58,9 @@ public class Joystick extends JavaPlugin {
 	private Economy econ;
 	private EconomyManager econManager;
 
+	// logger
+	private FileHandler fileHandler;
+
 	public Economy getEconomy() {
 		return econ;
 	}
@@ -68,7 +71,7 @@ public class Joystick extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		setupLogger();
+		fileHandler = setupLogger();
 
 		loadVault();
 
@@ -78,12 +81,34 @@ public class Joystick extends JavaPlugin {
 		saveConfig();
 	}
 
-	private void setupLogger() {
+	@Override
+	public void onDisable() {
+		closeLogger();
+	}
+
+	/**
+	 * Not satisfied with global logging, which can become cluttered and messy
+	 * with many plugins or players using commands, etc, the Bukkit logger will
+	 * log all relevant information to a log file. This log file can be found in
+	 * the plugin data folder, in the subdirectory <i>logs</i>.
+	 * <p>
+	 * The log file, <i>joystick.log</i>, will not be overriden. The logger will
+	 * simply append new information if the file already exists. All messages
+	 * will be logged in the format:<br>
+	 * [month-day-year hr-min-sec] (level): (message), where level is the
+	 * {@link LogRecord#getLevel()} and the message is the
+	 * {@link LogRecord#getMessage()}.
+	 * </p>
+	 * 
+	 * @return the created FileHandler, null if a SecurityException or
+	 *         IOException were thrown and handled.
+	 */
+	private FileHandler setupLogger() {
 		File dir = new File(getDataFolder() + File.separator + "logs");
 		dir.mkdirs();
 		try {
 			FileHandler handler = new FileHandler(dir + File.separator
-					+ "joystick.log");
+					+ "joystick.log", true);
 			getLogger().addHandler(handler);
 			handler.setFormatter(new SimpleFormatter() {
 
@@ -102,13 +127,26 @@ public class Joystick extends JavaPlugin {
 							+ System.getProperty("line.separator");
 				}
 			});
+			return handler;
 		}
 		catch (SecurityException | IOException e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
 	}
 
+	/**
+	 * Closes the file handler which was setup earlier to avoid memory leaks.
+	 */
+	private void closeLogger() {
+		if (fileHandler != null) {
+			fileHandler.close();
+		}
+	}
+
+	/**
+	 * Serves as an initializer for member variables.
+	 */
 	private void init() {
 		econManager = new EconomyManager(econ);
 
@@ -116,6 +154,12 @@ public class Joystick extends JavaPlugin {
 		config = new YamlConfiguration();
 	}
 
+	/**
+	 * Attempts to load vault as a dependency for economy rewards. If vault
+	 * cannot be found, the logger informs the user that economy rewards will
+	 * not function. If vault is found, but no valid Economy registration
+	 * provided, the user is prompted.
+	 */
 	private void loadVault() {
 		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
 		if (vault == null) {
@@ -140,41 +184,22 @@ public class Joystick extends JavaPlugin {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Overrides default getter operation
-	 * </p>
-	 */
 	@Override
 	public FileConfiguration getConfig() {
 		return config;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Overrides the default save operation
-	 * </p>
-	 */
 	@Override
 	public void saveConfig() {
 		try {
 			config.save(file);
 		}
 		catch (IOException e) {
-			// print stacktrace if you prefer
 			getLogger().severe(
 					"Could not save config.yml due to: " + e.getMessage());
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Override default implementation for reloading
-	 * </p>
-	 */
 	@Override
 	public void reloadConfig() {
 		if (!file.exists()) {
@@ -184,7 +209,15 @@ public class Joystick extends JavaPlugin {
 	}
 
 	/**
-	 * Scans the config file for any tabs.
+	 * Reads config file using a Scanner to search for tabs. In yaml files, the
+	 * presences of tabs instead of whitespace will cause the file to reset due
+	 * to snakeyaml errors. As a preventative measure, the scanner will read the
+	 * file for any tabs and an IllegalArgumentException will be thrown,
+	 * effectively forcing the file to remain in its current state until the
+	 * user fixes the file.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if a tab is found.
 	 */
 	private void scanConfig() {
 		// declare our scanner variable
