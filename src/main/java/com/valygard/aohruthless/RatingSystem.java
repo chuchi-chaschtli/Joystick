@@ -61,7 +61,7 @@ public abstract class RatingSystem {
 	 *            the Player to analyze
 	 * @return an int, an mmr estimate
 	 */
-	abstract int getTeamMMR(Player player);
+	protected abstract int getTeamMMR(Player player);
 
 	/**
 	 * Grabs the opponent team's mmr of a given Player. If the arena is a free
@@ -72,7 +72,7 @@ public abstract class RatingSystem {
 	 *            the Player to analyze opponents of
 	 * @return an int, an mmr estimate
 	 */
-	abstract int getOpponentMMR(Player player);
+	protected abstract int getOpponentMMR(Player player);
 
 	/**
 	 * Calculates the updated rating for a player.
@@ -120,7 +120,7 @@ public abstract class RatingSystem {
 	 *            Score
 	 * @param expectedScore
 	 *            Expected Score
-	 * @param kFactor
+	 * @param constant
 	 *            the calculated kFactor
 	 * @return the new rating of the player
 	 */
@@ -143,7 +143,8 @@ public abstract class RatingSystem {
 	 * Stronger players lose and gain less rating than weaker players do.
 	 * 
 	 * @param player
-	 * @return
+	 * @return the given player's score constant, based on current rating, base
+	 *         rating, and games played
 	 */
 	private double getScoreConstant(Player player) {
 		Arena arena = manager.getArenaWithPlayer(player);
@@ -163,7 +164,7 @@ public abstract class RatingSystem {
 		if (rating >= 0) {
 			return (0.001D / (0.035D - (0.01D * scoreFactor) + (playFactor * 0.0035D)));
 		}
-		return (0.001D / (-0.035D - (0.01D * scoreFactor) + (playFactor * 0.0035D)));
+		return (0.001D / (-0.015D - (0.01D * scoreFactor) + (playFactor * 0.0035D)));
 	}
 
 	/**
