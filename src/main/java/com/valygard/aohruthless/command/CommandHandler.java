@@ -30,9 +30,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
-import com.valygard.aohruthless.messenger.Messenger;
+import com.valygard.aohruthless.PluginBase;
 import com.valygard.aohruthless.messenger.Msg;
 import com.valygard.aohruthless.utils.PermissionUtils;
 
@@ -59,7 +58,7 @@ import com.valygard.aohruthless.utils.PermissionUtils;
  */
 public abstract class CommandHandler implements CommandExecutor {
 
-	protected Plugin plugin;
+	protected PluginBase plugin;
 	protected String cmdBase;
 
 	protected Map<String, Command> commands = new LinkedHashMap<>();
@@ -73,7 +72,7 @@ public abstract class CommandHandler implements CommandExecutor {
 	 * @param cmdBase
 	 *            the name of the command
 	 */
-	public CommandHandler(Plugin plugin, String cmdBase) {
+	public CommandHandler(PluginBase plugin, String cmdBase) {
 		this.plugin = plugin;
 		this.cmdBase = cmdBase;
 
@@ -87,8 +86,8 @@ public abstract class CommandHandler implements CommandExecutor {
 		String last = (args.length > 0 ? args[args.length - 1] : "");
 
 		if (first.matches("(?i)(version|plugin)")) {
-			Messenger.tell(sender, Msg.CMD_VERSION, "for " + cmdBase + ": "
-					+ getPluginInfo());
+			plugin.getMessenger().tell(sender, Msg.CMD_VERSION,
+					"for " + cmdBase + ": " + getPluginInfo());
 			return true;
 		}
 
@@ -104,7 +103,7 @@ public abstract class CommandHandler implements CommandExecutor {
 		}
 
 		if (last.equals("")) {
-			Messenger.tell(sender, Msg.CMD_HELP, cmdBase);
+			plugin.getMessenger().tell(sender, Msg.CMD_HELP, cmdBase);
 			return true;
 		}
 
@@ -112,7 +111,7 @@ public abstract class CommandHandler implements CommandExecutor {
 
 		// Eliminate duplicate matches by sending error message
 		if (matches.size() > 1) {
-			Messenger.tell(sender, Msg.CMD_MULTIPLE_MATCHES);
+			plugin.getMessenger().tell(sender, Msg.CMD_MULTIPLE_MATCHES);
 			for (Command command : matches) {
 				showUsage(command, sender, false);
 			}
@@ -120,7 +119,7 @@ public abstract class CommandHandler implements CommandExecutor {
 		}
 
 		if (matches.size() == 0) {
-			Messenger.tell(sender, Msg.CMD_NO_MATCHES, cmdBase);
+			plugin.getMessenger().tell(sender, Msg.CMD_NO_MATCHES, cmdBase);
 			return true;
 		}
 
@@ -130,7 +129,7 @@ public abstract class CommandHandler implements CommandExecutor {
 		CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
 
 		if (info.playerOnly() && !(sender instanceof Player)) {
-			Messenger.tell(sender, Msg.CMD_NOT_FROM_CONSOLE);
+			plugin.getMessenger().tell(sender, Msg.CMD_NOT_FROM_CONSOLE);
 			return true;
 		}
 
@@ -140,14 +139,14 @@ public abstract class CommandHandler implements CommandExecutor {
 		}
 
 		if (!PermissionUtils.has(sender, perm.value())) {
-			Messenger.tell(sender, Msg.CMD_NO_PERMISSION);
+			plugin.getMessenger().tell(sender, Msg.CMD_NO_PERMISSION);
 			return true;
 		}
 
 		String[] params = trimFirstArg(args);
 
 		if (params.length < info.argsRequired()) {
-			Messenger.tell(sender, Msg.CMD_NOT_ENOUGH_ARGS);
+			plugin.getMessenger().tell(sender, Msg.CMD_NOT_ENOUGH_ARGS);
 			showUsage(command, sender, true);
 			return true;
 		}
@@ -300,7 +299,8 @@ public abstract class CommandHandler implements CommandExecutor {
 		int cmds = allowed.size();
 
 		if (Math.ceil(cmds / 6.0) < page) {
-			Messenger.tell(sender,
+			plugin.getMessenger().tell(
+					sender,
 					"Given: " + page + "; Expected integer between 1 and "
 							+ (int) Math.ceil(cmds / 6.0));
 			return;
@@ -326,8 +326,10 @@ public abstract class CommandHandler implements CommandExecutor {
 					.append(" ").append(ChatColor.YELLOW).append(info.desc());
 		}
 
-		Messenger.tell(sender, ChatColor.DARK_GREEN + "Page " + page + ": "
-				+ ChatColor.RESET + builder.toString());
+		plugin.getMessenger().tell(
+				sender,
+				ChatColor.DARK_GREEN + "Page " + page + ": " + ChatColor.RESET
+						+ builder.toString());
 	}
 
 	/**

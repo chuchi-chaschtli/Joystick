@@ -28,48 +28,45 @@ import com.valygard.aohruthless.framework.Arena;
  */
 public class Messenger {
 
+	private final String prefix;
+
 	/**
-	 * Prevent initialization of utility class.
+	 * Messenger initializes by a prefix for all messages.
 	 * 
-	 * @throws AssertionError
-	 *             if attempted access by reflection
+	 * @param prefix
+	 *            a String prefix, usually the plugin name
 	 */
-	private Messenger() {
-		throw new AssertionError("Cannot initialize utility constructor");
+	public Messenger(String prefix) {
+		this.prefix = prefix;
 	}
 
-	public static boolean tell(CommandSender p, String msg) {
-		// If the input sender is null or the string is empty, return.
-		if (p == null || msg.equals(" ")) {
+	public boolean tell(CommandSender sender, String msg) {
+		if (sender == null || msg.trim().isEmpty()) {
 			return false;
 		}
-
-		// Otherwise, send the message with the plugin tag.
-		p.sendMessage(ChatColor.DARK_GRAY + "[Joystick] " + ChatColor.RESET
-				+ msg);
+		sender.sendMessage(prefix + ChatColor.RESET + " " + msg);
 		return true;
 	}
 
-	public static boolean tell(CommandSender p, Message msg, String s) {
-		return tell(p, msg.format(s));
+	public boolean tell(CommandSender sender, Message msg) {
+		return tell(sender, msg.toString());
 	}
 
-	public static boolean tell(CommandSender p, Message msg) {
-		return tell(p, msg.toString());
+	public boolean tell(CommandSender sender, Message msg, String s) {
+		return tell(sender, msg.format(s));
 	}
 
-	public static void announce(Arena arena, String msg) {
-		for (Player p : arena.getPlayers()) {
-			tell(p, msg);
+	public void announce(Arena arena, String msg) {
+		for (Player player : arena.getPlayers()) {
+			tell(player, msg);
 		}
 	}
 
-	public static void announce(Arena arena, Message msg, String s) {
-		announce(arena, msg.format(s));
-	}
-
-	public static void announce(Arena arena, Message msg) {
+	public void announce(Arena arena, Message msg) {
 		announce(arena, msg.toString());
 	}
 
+	public void announce(Arena arena, Message msg, String s) {
+		announce(arena, msg.format(s));
+	}
 }

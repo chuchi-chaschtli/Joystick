@@ -22,6 +22,7 @@ import java.text.DecimalFormat;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -317,23 +318,22 @@ public class PlayerStats {
 	 * terminated. Only the time-cycle in memory is updated every second, with
 	 * changes to config being written after the conclusion of the arena.
 	 */
-	public void startTiming() {
+	public void startTiming(Plugin plugin) {
 		if (!tracking) return;
 
-		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(),
-				new Runnable() {
+		task = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
 
-					public void run() {
-						timespent++;
-						if (!arena.isRunning()) {
-							task.cancel();
-							arenaContents.put("timeSpent", timespent);
-							arenaArray.set(0, arenaContents);
-							config.writeObject("_" + name, arenaArray);
-							return;
-						}
-					}
-				}, 20l, 20l);
+			public void run() {
+				timespent++;
+				if (!arena.isRunning()) {
+					task.cancel();
+					arenaContents.put("timeSpent", timespent);
+					arenaArray.set(0, arenaContents);
+					config.writeObject("_" + name, arenaArray);
+					return;
+				}
+			}
+		}, 20l, 20l);
 	}
 
 	// TODO: Accurately handle class data and document

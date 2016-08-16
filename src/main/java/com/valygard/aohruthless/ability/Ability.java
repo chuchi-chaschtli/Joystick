@@ -20,9 +20,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
-import com.valygard.aohruthless.messenger.Messenger;
+import com.valygard.aohruthless.PluginBase;
 import com.valygard.aohruthless.messenger.Msg;
 import com.valygard.aohruthless.utils.inventory.InventoryUtils;
 
@@ -45,6 +44,7 @@ import com.valygard.aohruthless.utils.inventory.InventoryUtils;
  */
 public abstract class Ability implements Listener {
 
+	protected final PluginBase plugin;
 	protected final String name;
 	protected final Material material;
 	protected final String perm;
@@ -54,7 +54,7 @@ public abstract class Ability implements Listener {
 	 * permission, and a materail type
 	 * 
 	 * @param plugin
-	 *            the underlying Plugin instance to register events
+	 *            the underlying plugin instance to register events
 	 * @param name
 	 *            the unique name for the ability
 	 * @param perm
@@ -62,7 +62,8 @@ public abstract class Ability implements Listener {
 	 * @param material
 	 *            the material type
 	 */
-	protected Ability(Plugin plugin, String name, String perm, Material material) {
+	protected Ability(PluginBase plugin, String name, String perm, Material material) {
+		this.plugin = plugin;
 		this.name = name;
 		this.perm = perm;
 		this.material = material;
@@ -76,9 +77,9 @@ public abstract class Ability implements Listener {
 	 * function properly.
 	 * 
 	 * @param plugin
-	 *            the underlying Plugin instance to register Listener
+	 *            the underlying plugin instance to register Listener
 	 */
-	protected abstract void registerAbility(Plugin plugin);
+	protected abstract void registerAbility(PluginBase plugin);
 
 	/**
 	 * Grabs ability name
@@ -119,7 +120,7 @@ public abstract class Ability implements Listener {
 	 */
 	public boolean onCheck(Player player) {
 		if (!player.hasPermission(perm)) {
-			Messenger.tell(player, Msg.ABILITY_NO_PERM);
+			plugin.getMessenger().tell(player, Msg.ABILITY_NO_PERM);
 			return false;
 		}
 		return InventoryUtils.removeItems(player, new ItemStack(material), 1) == 1;

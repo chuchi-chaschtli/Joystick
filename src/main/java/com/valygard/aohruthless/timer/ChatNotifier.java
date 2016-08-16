@@ -20,7 +20,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import com.valygard.aohruthless.framework.Arena;
-import com.valygard.aohruthless.messenger.Messenger;
 import com.valygard.aohruthless.messenger.Msg;
 
 /**
@@ -90,7 +89,7 @@ public class ChatNotifier implements TimerEvent {
 		if (index > -1) {
 			int timeLeft = Conversion.toSeconds(timer.getDuration());
 			if (timeLeft == intervals[index]) {
-				Messenger.announce(arena, msg,
+				arena.getPlugin().getMessenger().announce(arena, msg,
 						Conversion.formatIntoHHMMSS(timeLeft));
 				index--;
 

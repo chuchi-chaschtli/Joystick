@@ -35,10 +35,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.ArenaClass;
 import com.valygard.aohruthless.ArenaClass.ArmorType;
-import com.valygard.aohruthless.messenger.Messenger;
-import com.valygard.aohruthless.messenger.Msg;
 import com.valygard.aohruthless.utils.PermissionUtils;
-import com.valygard.aohruthless.utils.StringUtils;
 import com.valygard.aohruthless.utils.config.ConfigUtils;
 import com.valygard.aohruthless.utils.items.ItemParser;
 
@@ -672,24 +669,6 @@ public abstract class ArenaManager {
 
 		if (arena.getSpec() == null) missing.add("spectator,");
 		return missing;
-	}
-
-	/**
-	 * Tells a player which warps are missing.
-	 * 
-	 * @param arena
-	 * @param p
-	 */
-	public void tellHowManyMissing(Arena arena, Player p) {
-		if (missing.size() > 0) {
-			String formatted = StringUtils.formatList(missing, ",");
-			Messenger.tell(p, "Missing Warps: " + formatted);
-			// Although it should already be false, never hurts to be cautious.
-			arena.setReady(false);
-		} else {
-			Messenger.tell(p, Msg.ARENA_READY);
-			arena.setReady(true);
-		}
 	}
 
 	/**

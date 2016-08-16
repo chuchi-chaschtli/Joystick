@@ -21,9 +21,8 @@ import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
-import com.valygard.aohruthless.messenger.Messenger;
+import com.valygard.aohruthless.PluginBase;
 import com.valygard.aohruthless.messenger.Msg;
 
 /**
@@ -58,7 +57,7 @@ public abstract class CooldownAbility extends Ability {
 	 * integer {@code cooldown} in seconds.
 	 * 
 	 * @param plugin
-	 *            the underlying Plugin instance
+	 *            the underlying plugin instance
 	 * @param name
 	 *            the String name
 	 * @param perm
@@ -68,7 +67,7 @@ public abstract class CooldownAbility extends Ability {
 	 * @param cooldown
 	 *            the int cooldown in seconds between successive ability uses
 	 */
-	protected CooldownAbility(Plugin plugin, String name, String perm,
+	protected CooldownAbility(PluginBase plugin, String name, String perm,
 			Material material, int cooldown) {
 		super(plugin, name, perm, material);
 
@@ -138,7 +137,7 @@ public abstract class CooldownAbility extends Ability {
 		if (onCooldown(player)) {
 			double diff = cooldown
 					- ((System.currentTimeMillis() - cooldowns.get(player)) / 1000l);
-			Messenger.tell(player, Msg.ABILITY_COOLDOWN,
+			plugin.getMessenger().tell(player, Msg.ABILITY_COOLDOWN,
 					String.format("%.2f", diff));
 			return false;
 		}

@@ -22,9 +22,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.ArenaClass;
+import com.valygard.aohruthless.PluginBase;
 import com.valygard.aohruthless.RatingSystem;
 import com.valygard.aohruthless.framework.spawn.Spawnpoint;
 import com.valygard.aohruthless.player.PlayerData;
@@ -42,7 +42,7 @@ public interface Arena {
 	 * 
 	 * @return
 	 */
-	public Plugin getPlugin();
+	public PluginBase getPlugin();
 
 	/**
 	 * Grabs the String identifier for the arena

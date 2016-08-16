@@ -28,13 +28,12 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.valygard.aohruthless.ArenaClass;
+import com.valygard.aohruthless.PluginBase;
 import com.valygard.aohruthless.RatingSystem;
 import com.valygard.aohruthless.framework.spawn.Spawn;
 import com.valygard.aohruthless.framework.spawn.Spawnpoint;
-import com.valygard.aohruthless.messenger.Messenger;
 import com.valygard.aohruthless.player.PlayerData;
 import com.valygard.aohruthless.player.PlayerStats;
 import com.valygard.aohruthless.utils.config.LocationSerializer;
@@ -47,7 +46,7 @@ import com.valygard.aohruthless.utils.inventory.InventoryUtils;
 public abstract class ArenaTemplate implements Arena {
 
 	// general attributes
-	private Plugin plugin;
+	private PluginBase plugin;
 	private String arenaName;
 	private World world;
 
@@ -88,7 +87,7 @@ public abstract class ArenaTemplate implements Arena {
 	 * @param arenaName
 	 *            a String identifier
 	 */
-	public ArenaTemplate(Plugin plugin, String arenaName) {
+	public ArenaTemplate(PluginBase plugin, String arenaName) {
 		// General stuff
 		this.plugin = plugin;
 		this.arenaName = arenaName;
@@ -118,7 +117,7 @@ public abstract class ArenaTemplate implements Arena {
 	}
 
 	@Override
-	public Plugin getPlugin() {
+	public PluginBase getPlugin() {
 		return plugin;
 	}
 
@@ -364,7 +363,7 @@ public abstract class ArenaTemplate implements Arena {
 	public boolean kickPlayer(Player p) {
 		removePlayer(p, false);
 		p.kickPlayer("BANNED FOR LIFE! No but seriously, don't cheat again");
-		Messenger.announce(this, p.getName() + " has been caught cheating!");
+		plugin.getMessenger().announce(this, p.getName() + " has been caught cheating!");
 		return true;
 	}
 
@@ -401,9 +400,7 @@ public abstract class ArenaTemplate implements Arena {
 	public abstract void giveRandomClass(Player p);
 
 	@Override
-	public void schedule(Runnable r, long delay) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, r, delay);
-	}
+	public abstract void schedule(Runnable r, long delay);
 
 	@Override
 	public int hashCode() {

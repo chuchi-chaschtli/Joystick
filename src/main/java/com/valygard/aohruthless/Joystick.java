@@ -36,6 +36,7 @@ import java.util.logging.SimpleFormatter;
 import net.milkbowl.vault.economy.Economy;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -44,11 +45,13 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.valygard.aohruthless.messenger.Messenger;
+
 /**
  * @author Anand
  * 
  */
-public class Joystick extends JavaPlugin {
+public class Joystick extends JavaPlugin implements PluginBase {
 
 	// config
 	private File file;
@@ -61,12 +64,19 @@ public class Joystick extends JavaPlugin {
 	// logger
 	private FileHandler fileHandler;
 
+	// messenger
+	private Messenger messenger;
+
 	public Economy getEconomy() {
 		return econ;
 	}
 
 	public EconomyManager getEconomyManager() {
 		return econManager;
+	}
+
+	public Messenger getMessenger() {
+		return messenger;
 	}
 
 	@Override
@@ -148,6 +158,7 @@ public class Joystick extends JavaPlugin {
 	 * Serves as an initializer for member variables.
 	 */
 	private void init() {
+		messenger = new Messenger(ChatColor.DARK_GRAY + "[Joystick]");
 		econManager = new EconomyManager(econ);
 
 		file = new File(getDataFolder(), "config.yml");
